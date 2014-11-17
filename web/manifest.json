@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Pulse",
+  "short_name": "pulsefs",
+  "description": "Pulse client for Chrome OS",
+
+  "version": "0.0.1.0",
+
+  "icons": {
+    "128": "icon_128.png"
+  },
+
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  }
+}

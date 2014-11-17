@@ -1,0 +1,7 @@
+name: pulsefs
+description: Pulse client for Chrome OS
+dependencies:
+  chrome: any
+  unittest: any
+transformers:
+- chrome
