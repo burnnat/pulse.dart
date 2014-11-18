@@ -1,14 +1,23 @@
 import 'dart:typed_data';
 import 'package:pulsefs/message.dart';
+import 'package:pulsefs/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 class TestMessage extends BlockMessage {
-  Uint32List payload;
+  final TestPayload payload;
 
   TestMessage(int version, int id, int type, this.payload, bool compress)
     : super(version, id, type, compress);
 
-  ByteBuffer writePayload() => payload.buffer;
+  XdrPayload getPayload() => payload;
+}
+
+class TestPayload extends XdrPayload {
+  final Uint32List data;
+
+  TestPayload(this.data);
+
+  ByteBuffer toBuffer() => data.buffer;
 }
 
 void runTests() {
@@ -22,11 +31,11 @@ void runTests() {
       1,
       2204,
       BlockMessage.TYPE_CLOSE,
-      payload,
+      new TestPayload(payload),
       false
     );
 
-    Uint32List data = new Uint32List.view(m.writeData());
+    Uint32List data = new Uint32List.view(m.toBuffer());
 
     test('has correct size', () {
       expect(data, hasLength(payload.length + 2));

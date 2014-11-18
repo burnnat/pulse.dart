@@ -1,26 +1,35 @@
-library message;
+library pulsefs.message;
 
 import 'dart:typed_data';
+import 'package:pulsefs/xdr.dart';
 
-abstract class BlockMessage {
+abstract class Message {
+  const Message();
+
+  ByteBuffer toBuffer();
+  XdrPayload getPayload();
+}
+
+abstract class BlockMessage extends Message {
   final int version;
   final int id;
   final int type;
   final bool compressed;
 
-  static final int TYPE_CLUSTER_CONFIG = 0;
-  static final int TYPE_INDEX = 1;
-  static final int TYPE_REQUEST = 2;
-  static final int TYPE_RESPONSE = 3;
-  static final int TYPE_PING = 4;
-  static final int TYPE_PONG = 5;
-  static final int TYPE_INDEX_UPDATE = 6;
-  static final int TYPE_CLOSE = 7;
+  static const int TYPE_CLUSTER_CONFIG = 0;
+  static const int TYPE_INDEX = 1;
+  static const int TYPE_REQUEST = 2;
+  static const int TYPE_RESPONSE = 3;
+  static const int TYPE_PING = 4;
+  static const int TYPE_PONG = 5;
+  static const int TYPE_INDEX_UPDATE = 6;
+  static const int TYPE_CLOSE = 7;
 
   const BlockMessage(this.version, this.id, this.type, this.compressed);
 
-  ByteBuffer writeData() {
-    Uint32List payload = new Uint32List.view(writePayload());
+  @override
+  ByteBuffer toBuffer() {
+    Uint32List payload = new Uint32List.view(getPayload().toBuffer());
     Uint32List data = new Uint32List(payload.length + 2);
 
     // Write message header
@@ -35,6 +44,4 @@ abstract class BlockMessage {
 
     return data.buffer;
   }
-
-  ByteBuffer writePayload();
 }
