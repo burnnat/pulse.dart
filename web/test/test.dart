@@ -1,7 +1,6 @@
-import 'package:unittest/html_enhanced_config.dart';
+import 'package:unittest/unittest.dart';
 import 'message_test.dart' as message;
 
 void runTests() {
-    useHtmlEnhancedConfiguration();
-    message.runTests();
+  message.runTests();
 }

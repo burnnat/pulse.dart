@@ -18,6 +18,6 @@ chrome.app.runtime.onLaunched.addListener(function(launchData) {
     );
   };
 
-  // openWindow('main');
+  openWindow('main');
   openWindow('test');
 });

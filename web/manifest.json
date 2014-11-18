@@ -14,5 +14,15 @@
     "background": {
       "scripts": ["background.js"]
     }
+  },
+
+  "sockets": {
+    "udp": {
+      "bind": "*",
+      "multicastMembership": ""
+    },
+    "tcp": {
+      "connect": "*"
+    }
   }
 }
