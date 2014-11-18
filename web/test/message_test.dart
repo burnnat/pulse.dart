@@ -1,3 +1,5 @@
+library pulse.message_test;
+
 import 'dart:typed_data';
 import 'package:pulsefs/message.dart';
 import 'package:pulsefs/xdr.dart';

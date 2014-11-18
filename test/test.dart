@@ -12,7 +12,7 @@ void main() {
   Isolate
     .spawnUri(
       Uri.parse('${dir.path}/web/test/test.dart'),
-      ['testing'],
+      [],
       port.sendPort
       // Rather than manually creating symlinks, the idiomatic
       // approach would be to use the 'packageRoot' argument:

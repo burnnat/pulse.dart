@@ -53,12 +53,16 @@ abstract class XdrPayload {
     int length = data.length;
     int padding = 4 - (length % 4);
 
-    if (padding < 4) {
-      data.length = length + padding;
-      data.fillRange(length, data.length, 0);
+    if (padding == 4) {
+      return data;
     }
 
-    return data;
+    List<int> padded = new List<int>(length + padding);
+
+    padded.setRange(0, length, data);
+    padded.fillRange(length, padded.length, 0);
+
+    return padded;
   }
 }
 
@@ -70,7 +74,7 @@ class Short extends XdrPayload {
   @override
   List<int> toBytes() {
     return pad([
-      value >> 16,
+      value >> 8,
       value
     ]);
   }
