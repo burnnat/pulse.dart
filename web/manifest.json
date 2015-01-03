@@ -19,7 +19,7 @@
   "sockets": {
     "udp": {
       "bind": "*",
-      "multicastMembership": ""
+      "send": "*"
     },
     "tcp": {
       "connect": "*"

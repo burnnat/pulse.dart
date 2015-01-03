@@ -1,25 +1,24 @@
-import 'dart:io';
 import 'dart:isolate';
 
-void main() {
-  Directory dir = new File.fromUri(Platform.script).parent.parent;
+import 'package:unittest/unittest.dart' as unittest;
+import '../web/test/test.dart';
 
-  Link link = new Link('${dir.path}/web/test/packages');
-  link.createSync('${dir.path}/packages');
+class WaitConfiguration extends unittest.SimpleConfiguration {
+  final SendPort port;
 
-  ReceivePort port = new ReceivePort();
+  WaitConfiguration(this.port);
 
-  Isolate
-    .spawnUri(
-      Uri.parse('${dir.path}/web/test/test.dart'),
-      [],
-      port.sendPort
-      // Rather than manually creating symlinks, the idiomatic
-      // approach would be to use the 'packageRoot' argument:
-      // packageRoot: Uri.parse('${dir.path}/packages')
-      // Unfortunately, not all platforms support this.
-    )
-    .then((_) => port.first);
+  void onDone(bool passed) {
+    try {
+      super.onDone(passed);
+    }
+    finally {
+      port.send(passed);
+    }
+  }
+}
 
-  link.deleteSync();
+void main(List<String> args, SendPort port) {
+  unittest.unittestConfiguration = new WaitConfiguration(port);
+  runTests();
 }

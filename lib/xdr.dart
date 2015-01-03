@@ -4,6 +4,8 @@ import 'dart:mirrors';
 import 'dart:typed_data';
 import 'dart:convert';
 
+import 'package:quiver/iterables.dart';
+
 class XdrEncodingException implements Exception {
   final Object value;
 
@@ -23,15 +25,27 @@ abstract class XdrPayload {
     List<int> bytes = new List<int>();
 
     InstanceMirror mirror = reflect(this);
-    dynamic declarations = mirror.type.declarations;
 
-    declarations.keys
-      .where((symbol) {
-        DeclarationMirror mirror = declarations[symbol];
-        return mirror is VariableMirror && !mirror.isStatic;
-      })
-      .map((symbol) => mirror.getField(symbol).reflectee)
-      .forEach((value) => addValue(bytes, value));
+    Iterable<ClassMirror> types = new GeneratingIterable<ClassMirror>(
+      () => mirror.type,
+      (prev) => prev.superclass
+    );
+
+    types
+      .toList()
+      // Reverse so superclass fields are added first
+      .reversed
+      .forEach((type) {
+        dynamic declarations = type.declarations;
+
+        declarations.keys
+          .where((symbol) {
+            DeclarationMirror mirror = declarations[symbol];
+            return mirror is VariableMirror && !mirror.isStatic;
+          })
+          .map((symbol) => mirror.getField(symbol).reflectee)
+          .forEach((value) => addValue(bytes, value));
+      });
 
     return bytes;
   }

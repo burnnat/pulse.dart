@@ -1,31 +1,11 @@
-import 'dart:isolate';
-
-import 'package:unittest/unittest.dart' as unittest;
-
+import 'luhn_test.dart' as luhn;
 import 'message_test.dart' as message;
+import 'message_discovery_test.dart' as message_discovery;
 import 'xdr_test.dart' as xdr;
 
 void runTests() {
+  luhn.runTests();
   message.runTests();
+  message_discovery.runTests();
   xdr.runTests();
-}
-
-class WaitConfiguration extends unittest.SimpleConfiguration {
-  final SendPort port;
-
-  WaitConfiguration(this.port);
-
-  void onDone(bool passed) {
-    try {
-      super.onDone(passed);
-    }
-    finally {
-      port.send(passed);
-    }
-  }
-}
-
-void main(List<String> args, SendPort port) {
-  unittest.unittestConfiguration = new WaitConfiguration(port);
-  runTests();
 }
