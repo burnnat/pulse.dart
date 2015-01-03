@@ -15,6 +15,23 @@ class DiscoveryMessage extends Message {
 
   const DiscoveryMessage(this.payload);
 
+  static DiscoveryPayload _parsePayload(List<int> raw) {
+    List<int> bytes = new List.from(raw);
+    Int magic = new Int.fromBytes(bytes.sublist(0, 4));
+
+    if (magic == DiscoveryAnnouncement.MAGIC) {
+      return new DiscoveryAnnouncement.fromBytes(bytes);
+    }
+    else if (magic == DiscoveryQuery.MAGIC) {
+      return new DiscoveryQuery.fromBytes(bytes);
+    }
+    else {
+      return null;
+    }
+  }
+
+  DiscoveryMessage.fromBytes(List<int> bytes) : this(_parsePayload(bytes));
+
   @override
   ByteBuffer toBuffer() => getPayload().toBuffer();
 
@@ -23,17 +40,19 @@ class DiscoveryMessage extends Message {
 }
 
 abstract class DiscoveryPayload extends XdrPayload {
-  final Int magic;
+  Int magic;
 
-  const DiscoveryPayload(this.magic);
+  DiscoveryPayload(this.magic);
+  DiscoveryPayload.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
 class DiscoveryQuery extends DiscoveryPayload {
   static const Int MAGIC = const Int(0x2CA856F5);
 
-  final DeviceId deviceId;
+  DeviceId deviceId;
 
-  const DiscoveryQuery(this.deviceId) : super(MAGIC);
+  DiscoveryQuery(this.deviceId) : super(MAGIC);
+  DiscoveryQuery.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 
   static DiscoveryMessage message(Opaque deviceId)
     => new DiscoveryMessage(new DiscoveryQuery(deviceId));
@@ -42,17 +61,19 @@ class DiscoveryQuery extends DiscoveryPayload {
 class DiscoveryAnnouncement extends DiscoveryPayload {
   static const Int MAGIC = const Int(0x9D79BC39);
 
-  final Device current;
-  final List<Device> extras;
+  Device current;
+  List<Device> extras;
 
-  const DiscoveryAnnouncement(this.current, this.extras) : super(MAGIC);
+  DiscoveryAnnouncement(this.current, this.extras) : super(MAGIC);
+  DiscoveryAnnouncement.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
 class Device extends XdrPayload {
-  final DeviceId id;
-  final List<Address> addresses;
+  DeviceId id;
+  List<Address> addresses;
 
-  const Device(this.id, this.addresses);
+  Device(this.id, this.addresses);
+  Device.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
 class DeviceId extends Opaque {
@@ -74,11 +95,63 @@ class DeviceId extends Opaque {
   }
 
   DeviceId(String id) : super(_decode(id));
+  DeviceId.fromBytes(List<int> bytes) : super.fromBytes(bytes);
+
+  @override
+  String toString() {
+    String s = base32.encode(this.data);
+
+    return [
+        s.substring(0, 13),
+        s.substring(13, 26),
+        s.substring(26, 39),
+        s.substring(39, 52)
+      ]
+      .expand(
+        (chunk) => [
+          chunk.substring(0, 7),
+          chunk.substring(7) + luhn.base32.generate(chunk)
+        ]
+      )
+      .reduce((a, b) => a + '-' + b);
+  }
 }
 
 class Address extends XdrPayload {
-  final Opaque ip;
-  final Int port;
+  IP ip;
+  Int port;
 
-  const Address(this.ip, this.port);
+  Address(this.ip, this.port);
+  Address.fromBytes(List<int> bytes) : super.fromBytes(bytes);
+}
+
+class IP extends Opaque {
+  static final IP AUTO = new IP._auto();
+
+  IP._auto() : super([]);
+
+  static List<int> _decode(String address) {
+    return address
+      .split('.')
+      .map((octet) => int.parse(octet, radix: 10))
+      .toList();
+  }
+
+  IP.v4(String address) : super(_decode(address));
+  IP.fromBytes(List<int> bytes) : super.fromBytes(bytes);
+
+  @override
+  String toString() {
+    switch (data.length) {
+      case 0:
+        return 'AUTO';
+      case 4:
+        // IPv4
+        return data.join('.');
+      case 16:
+        // IPv6
+      default:
+        return data.toString();
+    }
+  }
 }

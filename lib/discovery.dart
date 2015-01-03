@@ -92,7 +92,8 @@ class GlobalDiscoverer extends Discoverer {
     _init()
       .then((success) {
         chrome.sockets.udp.onReceive.listen((packet) {
-          write('Received message: ${packet.data}');
+          DiscoveryMessage message = new DiscoveryMessage.fromBytes(packet.data.getBytes());
+          write('Received message: ${message.payload}');
         });
 
         write('Set up listener.');
