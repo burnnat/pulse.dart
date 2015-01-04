@@ -1,41 +1,21 @@
-import 'dart:html';
 import 'dart:js';
 
 import 'package:logging/logging.dart';
-import 'package:pulsefs/discovery.dart';
-import 'test/test_html.dart';
 
-final Logger logger = new Logger('pulsefs');
-
-Discoverer discoverer;
+import 'background.dart' as background;
+import 'interface.dart' as interface;
 
 void main() {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((LogRecord rec) {
-    String message = '${rec.level.name}: ${rec.time}: ${rec.message}';
-    querySelector('#logs').appendHtml('<div>$message</div>');
+    print('${rec.level.name}: ${rec.time}: ${rec.message}');
   });
 
-  if (context['id'] == 'test') {
-    querySelector('#root').remove();
-    runHtmlTests();
+  // This value is set by the accompanying script, background.js
+  if (context['isBackground']) {
+    background.main();
   }
   else {
-    discoverer = new ChainedDiscoverer([
-      new LocalDiscoverer(21025),
-      new GlobalDiscoverer('announce.syncthing.net', 22026)
-    ]);
-
-    querySelector('#send-request').onClick.listen(sendRequest);
+    interface.main();
   }
-}
-
-DeviceId id = new DeviceId('MEUFKLW-DSKHAZM-IRZBSBW-U6RE65I-SHLD7AF-VQY2OVU-LYEXABO-F53URAM');
-
-void sendRequest(MouseEvent event) {
-  logger.info('Button click detected');
-
-  discoverer
-    .locate(id)
-    .then((address) => logger.info('Located address: $address'));
 }
