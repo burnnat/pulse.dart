@@ -20,19 +20,36 @@ void main() {
     runHtmlTests();
   }
   else {
-    Discoverer discoverer = new ChainedDiscoverer([
-      new LocalDiscoverer(21025),
-      new GlobalDiscoverer('announce.syncthing.net', 22026)
-    ]);
+    String idString = 'MEUFKLW-DSKHAZM-IRZBSBW-U6RE65I-SHLD7AF-VQY2OVU-LYEXABO-F53URAM';
 
-    DeviceId id = new DeviceId('MEUFKLW-DSKHAZM-IRZBSBW-U6RE65I-SHLD7AF-VQY2OVU-LYEXABO-F53URAM');
+    querySelector('#mound-device').onClick.listen((event) {
+      logger.info('Mounting device: $idString');
+
+      context['chrome']['fileSystemProvider'].callMethod('mount', [
+        new JsObject.jsify({
+          'fileSystemId': idString,
+          'displayName': 'ARBOL',
+          'writable': false
+        }),
+        (success) {
+          logger.info('Mount ' + (success ? 'succeeded' : 'failed'));
+        }
+      ]);
+    });
 
     querySelector('#send-request').onClick.listen((event) {
-      logger.info('Button click detected');
+      logger.info('Sending query request');
+
+      Discoverer discoverer = new ChainedDiscoverer([
+        new LocalDiscoverer(21025),
+        new GlobalDiscoverer('announce.syncthing.net', 22026)
+      ]);
 
       discoverer
-        .locate(id)
-        .then((address) => logger.info('Located address: $address'));
+        .locate(new DeviceId(idString))
+        .then((address) {
+          logger.info('Located address: $address');
+        });
     });
   }
 }
