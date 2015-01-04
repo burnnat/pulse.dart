@@ -5,6 +5,7 @@ dependencies:
   #   git: git://github.com/burnnat/forge.dart
   chrome: any
   base32: any
+  logging: any
   quiver: any
 dev_dependencies:
   unittest: any

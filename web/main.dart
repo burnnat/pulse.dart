@@ -1,46 +1,41 @@
-import 'dart:async';
 import 'dart:html';
 import 'dart:js';
 
+import 'package:logging/logging.dart';
 import 'package:pulsefs/discovery.dart';
-import 'package:chrome/chrome_app.dart' as chrome;
 import 'test/test_html.dart';
+
+final Logger logger = new Logger('pulsefs');
 
 Discoverer discoverer;
 
 void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    String message = '${rec.level.name}: ${rec.time}: ${rec.message}';
+    querySelector('#logs').appendHtml('<div>$message</div>');
+  });
+
   if (context['id'] == 'test') {
     querySelector('#root').remove();
     runHtmlTests();
   }
   else {
-    // TODO: for TLS support, see this implementation:
-    // https://github.com/flackr/circ/blob/master/package/bin/net/ssl_socket.js
+    discoverer = new ChainedDiscoverer([
+      new LocalDiscoverer(21025),
+      new GlobalDiscoverer('announce.syncthing.net', 22026)
+    ]);
 
-    // int socket;
-
-    // chrome.sockets.udp.create()
-    //   .then((info) => socket = info.socketId)
-    //   .then((_) => chrome.sockets.udp.bind(socket, '0.0.0.0', 21025))
-    //   // .then((_) => chrome.sockets.udp.joinGroup(socket, '224.0.0.1'))
-    //   .then((result) {
-    //     write('Opened UDP socket: ' + (result < 0 ? 'error' : 'success'));
-    //     chrome.sockets.udp.onReceive.listen((packet) {
-    //       write('Received message: ${packet.data}');
-    //     });
-    //   })
-    //   ;
-
-    discoverer = new GlobalDiscoverer(write);
     querySelector('#send-request').onClick.listen(sendRequest);
   }
 }
 
-void sendRequest(MouseEvent event) {
-  write('Button click detected');
-  discoverer.discover();
-}
+DeviceId id = new DeviceId('MEUFKLW-DSKHAZM-IRZBSBW-U6RE65I-SHLD7AF-VQY2OVU-LYEXABO-F53URAM');
 
-void write(String message) {
-  querySelector('#logs').appendHtml('<div>$message</div>');
+void sendRequest(MouseEvent event) {
+  logger.info('Button click detected');
+
+  discoverer
+    .locate(id)
+    .then((address) => logger.info('Located address: $address'));
 }

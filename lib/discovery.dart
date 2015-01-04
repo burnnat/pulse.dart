@@ -4,107 +4,192 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:pulsefs/message_discovery.dart';
-import 'package:pulsefs/xdr.dart';
+export 'package:pulsefs/message_discovery.dart' show DeviceId, Address, IP;
+export 'package:pulsefs/xdr.dart' show Int;
 
+import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
+import 'package:quiver/async.dart';
 
-typedef void Logger(String message);
+final Logger logger = new Logger('pulsefs.discovery');
 
 abstract class Discoverer {
+  Future<Address> locate(DeviceId device);
+}
 
-  String get _address;
-  int get _port;
+class ChainedDiscoverer extends Discoverer {
+  final List<Discoverer> _discoverers;
 
-  final Logger write;
+  ChainedDiscoverer(this._discoverers);
+
+  @override
+  Future<Address> locate(DeviceId device) {
+    Completer<Address> completer = new Completer();
+
+    doWhileAsync(
+      _discoverers,
+      (discoverer) => discoverer.locate(device)
+        .then((address) {
+          if (address != null) {
+            // We have an address, so stop iterating.
+            completer.complete(address);
+            return false;
+          }
+          else {
+            // No address found, continue to next discoverer.
+            return true;
+          }
+        })
+        // Continue to next discoverer if we run into errors.
+        .catchError((e) => true)
+    )
+    .then((result) {
+      if (result) {
+        // No discoverers found an address, so return null.
+        completer.complete(null);
+      }
+    });
+
+    return completer.future;
+  }
+}
+
+class ConnectionException implements Exception {
+  final int code;
+
+  ConnectionException(int code)
+    : this.code = code < 0 ? -code : code;
+
+  @override
+  String toString() => 'Connection error: $code';
+}
+
+abstract class UdpDiscoverer extends Discoverer {
+
+  final int port;
 
   int _socket = null;
+  Future<bool> _initializing = null;
 
-  Discoverer(this.write);
+  UdpDiscoverer(this.port);
 
   Future<bool> _init() {
-    if (_socket != null) {
-      return new Future.value(true);
+    if (_initializing == null) {
+      if (_socket != null) {
+        // We've already initialized the socket.
+        return new Future.value(false);
+      }
+      else {
+        _initializing = _create();
+      }
     }
-    else {
-      write('Initializing UDP socket connection...');
 
-      return chrome.sockets.udp.create()
-        .then((info) {
-          _socket = info.socketId;
-          return chrome.sockets.udp.bind(_socket, '0.0.0.0', _port);
-        })
-        .then((result) {
-          write('Opened UDP socket: ' + (result < 0 ? 'error' : 'success'));
-          return result >= 0;
-        });
-    }
+    return _initializing;
   }
 
-  Future<bool> _send(DiscoveryMessage message) {
+  Future<bool> _create() {
+    logger.fine('Initializing UDP socket connection');
+    return chrome.sockets.udp.create()
+      .then((info) {
+        _socket = info.socketId;
+        return chrome.sockets.udp.bind(_socket, '0.0.0.0', port);
+      })
+      .then((result) {
+        _checkError('Opened UDP socket', result);
+        return true;
+      });
+  }
+
+  Future<int> _send(String remoteAddress, DiscoveryMessage message) {
     chrome.ArrayBuffer data = new chrome.ArrayBuffer.fromBytes(
       new Uint8List.view(message.toBuffer())
     );
 
-    return chrome.sockets.udp.send(_socket, data, _address, _port)
+    return _init()
+      .then((success) => chrome.sockets.udp.send(_socket, data, remoteAddress, port))
       .then((info) {
-        int result = info.resultCode;
-        write('Sent message data: ' + (result < 0 ? 'error' : 'success'));
-        return result >= 0;
+        _checkError('Sent message data', info.resultCode);
+        return info.bytesSent;
       });
   }
 
-  void announce() {
+  void _checkError(String message, int result) {
+    bool hasError = result < 0;
+    logger.fine('$message: ' + (hasError ? 'error' : 'success'));
 
+    if (hasError) {
+      throw new ConnectionException(result);
+    }
   }
 
-  void discover();
-}
-
-class LocalDiscoverer extends Discoverer {
-  LocalDiscoverer(Logger write) : super(write);
-
-  String get _address => '255.255.255.255'; // '0.0.0.0'
-  int get _port => 21025;
-
-  void discover() {
-    int socket;
-
-    chrome.sockets.udp.create()
-      .then((info) => socket = info.socketId)
-      .then((_) => chrome.sockets.udp.bind(socket, _address, _port))
-      // .then((_) => chrome.sockets.udp.joinGroup(socket, '224.0.0.1'))
-      .then((result) {
-        write('Opened UDP socket: ' + (result < 0 ? 'error' : 'success'));
-        chrome.sockets.udp.onReceive.listen((packet) {
-          write('Received message: ${packet.data}');
-        });
-      });
+  DiscoveryMessage _parseMessage(chrome.ReceiveInfo info) {
+    DiscoveryMessage message = new DiscoveryMessage.fromBytes(info.data.getBytes());
+    logger.fine('Received message: ${message.payload}');
+    return message;
   }
 }
 
-class GlobalDiscoverer extends Discoverer {
-  GlobalDiscoverer(Logger write) : super(write);
+class LocalDiscoverer extends UdpDiscoverer {
+  static final String _broadcast = '255.255.255.255';
 
-  String get _address => 'announce.syncthing.net';
-  int get _port => 22026;
+  final Map<DeviceId, List<Address>> _cache = {};
 
-  void discover() {
-    _init()
-      .then((success) {
-        chrome.sockets.udp.onReceive.listen((packet) {
-          DiscoveryMessage message = new DiscoveryMessage.fromBytes(packet.data.getBytes());
-          write('Received message: ${message.payload}');
-        });
+  LocalDiscoverer(int port) : super(port);
 
-        write('Set up listener.');
+  @override
+  Future<bool> _create() {
+    return super._create()
+      .then((created) {
+        chrome.sockets.udp.onReceive
+          .listen((packet) => _onReceive(_parseMessage(packet)));
 
-        DeviceId id = new DeviceId('MEUFKLW-DSKHAZM-IRZBSBW-U6RE65I-SHLD7AF-VQY2OVU-LYEXABO-F53URAM');
-
-        return _send(
-          new DiscoveryMessage(
-            new DiscoveryQuery(id)
-          )
-        );
+        return created;
       });
+  }
+
+  void _onReceive(DiscoveryMessage message) {
+    DiscoveryPayload payload = message.payload;
+
+    if (payload is DiscoveryAnnouncement) {
+      List<Device> devices = [payload.current];
+      devices.addAll(payload.extras);
+
+      devices.forEach((device) {
+        _cache[device.id] = new List.from(device.addresses);
+      });
+    }
+  }
+
+  @override
+  Future<Address> locate(DeviceId device) {
+    List<Address> matches = _cache[device];
+    return new Future.value(matches != null ? matches.first : null);
+  }
+}
+
+class GlobalDiscoverer extends UdpDiscoverer {
+  static const Duration defaultTimeout = const Duration(seconds: 5);
+
+  final String address;
+  final Duration timeout;
+
+  GlobalDiscoverer(this.address, int port, { this.timeout: defaultTimeout })
+    : super(port);
+
+  @override
+  Future<Address> locate(DeviceId device) {
+    Future<Address> result =
+      _init()
+        .then((success) => chrome.sockets.udp.onReceive.first)
+        .then((packet) => _parseMessage(packet))
+        .then((message) {
+          DiscoveryAnnouncement payload = message.payload;
+          return payload.current.addresses.first;
+        })
+        .timeout(timeout, onTimeout: () => null);
+
+    _send(address, new DiscoveryMessage(new DiscoveryQuery(device)));
+
+    return result;
   }
 }
