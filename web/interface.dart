@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:js';
 
 import 'package:logging/logging.dart';
+import 'package:chrome/chrome_app.dart' as chrome;
 import 'package:pulsefs/discovery.dart';
 import 'test/test_html.dart';
 
@@ -31,8 +32,13 @@ void main() {
           'displayName': 'ARBOL',
           'writable': false
         }),
-        (success) {
-          logger.info('Mount ' + (success ? 'succeeded' : 'failed'));
+        () {
+          if (chrome.runtime.lastError != null) {
+            logger.severe('Mount failed: ${chrome.runtime.lastError.message}');
+          }
+          else {
+            logger.info('Mount succeeded');
+          }
         }
       ]);
     });

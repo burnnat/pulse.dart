@@ -3,6 +3,7 @@ library pulsefs.handler;
 import 'dart:js';
 
 import 'package:logging/logging.dart';
+import 'package:chrome/chrome_app.dart' as chrome;
 
 final Logger logger = new Logger('pulsefs.handler');
 
@@ -68,6 +69,20 @@ class FilesystemHandler {
   }
 
   void _unmount(JsObject options, JsFunction success, JsFunction error) {
-    success.apply([]);
+    context['chrome']['fileSystemProvider'].callMethod('unmount', [
+      new JsObject.jsify({
+        'fileSystemId': options['fileSystemId']
+      }),
+      () {
+        if (chrome.runtime.lastError != null) {
+          logger.severe('Unmount failed: ${chrome.runtime.lastError.message}');
+          error.apply(['FAILED']);
+        }
+        else {
+          logger.info('Unmount succeeded');
+          success.apply([]);
+        }
+      }
+    ]);
   }
 }
