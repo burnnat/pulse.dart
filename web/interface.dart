@@ -22,7 +22,7 @@ void main() {
   else {
     String idString = 'MEUFKLW-DSKHAZM-IRZBSBW-U6RE65I-SHLD7AF-VQY2OVU-LYEXABO-F53URAM';
 
-    querySelector('#mound-device').onClick.listen((event) {
+    querySelector('#mount-device').onClick.listen((event) {
       logger.info('Mounting device: $idString');
 
       context['chrome']['fileSystemProvider'].callMethod('mount', [

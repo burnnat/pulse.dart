@@ -15,6 +15,7 @@ class FilesystemHandler {
   FilesystemHandler() : this.provider = _initProvider();
 
   void register() {
+    _register('onUnmountRequested', _unmount);
     _register('onGetMetadataRequested', _getMetadata);
     _register('onReadDirectoryRequested', _readDirectory);
     _register('onReadFileRequested', _readFile);
@@ -22,20 +23,40 @@ class FilesystemHandler {
   }
 
   void _register(String eventName, EventHandler handler) {
-    provider[eventName].callMethod('addListener', [
+    JsObject event = new JsObject.fromBrowserObject(provider[eventName]);
+    event.callMethod('addListener', [
       (JsObject options, JsFunction success, JsFunction error) {
         logger.fine('Event: $eventName');
+        String rendered = context['JSON'].callMethod('stringify', [options]);
+        logger.fine('Options: $rendered');
         Function.apply(handler, [options, success, error]);
       }
     ]);
   }
 
-  void _getMetadata(JsObject options, JsFunction success, JsFunction error) {
+  JsObject _entryMeta(
+    bool isDirectory, String name,
+    { int size: 0, DateTime modified: null }) {
 
+    return new JsObject.jsify({
+      'isDirectory': isDirectory,
+      'name': name,
+      'size': size,
+      'modificationTime': modified != null ? modified : new DateTime.now()
+    });
+  }
+
+  void _getMetadata(JsObject options, JsFunction success, JsFunction error) {
+    success.apply([
+      _entryMeta(true, 'Name')
+    ]);
   }
 
   void _readDirectory(JsObject options, JsFunction success, JsFunction error) {
-
+    success.apply([
+      new JsArray.from([]),
+      false
+    ]);
   }
 
   void _readFile(JsObject options, JsFunction success, JsFunction error) {
@@ -43,6 +64,10 @@ class FilesystemHandler {
   }
 
   void _abort(JsObject options, JsFunction success, JsFunction error) {
+    success.apply([]);
+  }
 
+  void _unmount(JsObject options, JsFunction success, JsFunction error) {
+    success.apply([]);
   }
 }

@@ -10,9 +10,9 @@ final Logger logger = new Logger('pulsefs');
 void main() {
   logger.info('Executing background script');
 
-  chrome.app.runtime.onLaunched.listen((launchData) {
-    new FilesystemHandler().register();
+  new FilesystemHandler().register();
 
+  chrome.app.runtime.onLaunched.listen((launchData) {
     chrome.app.window.create(
       'index.html',
       new chrome.CreateWindowOptions(
