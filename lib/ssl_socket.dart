@@ -3,17 +3,19 @@ library pulsefs.ssl_socket;
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
 import 'package:forge/forge.dart' as forge;
+
+final Logger logger = new Logger('pulsefs');
 
 String _fromBuffer(ByteBuffer buffer) {
   Uint16List data = new Uint16List.view(buffer);
   return new String.fromCharCodes(data.toList());
 }
 
-ByteBuffer _fromString(String string) {
-  List<int> data = string.codeUnits;
-  return new Uint16List.fromList(data).buffer;
+chrome.ArrayBuffer _fromString(forge.ByteBuffer buffer) {
+  return new chrome.ArrayBuffer.fromString(buffer.getBytes());
 }
 
 abstract class SslSocket implements forge.TlsHandler {
@@ -104,7 +106,7 @@ abstract class SslSocket implements forge.TlsHandler {
   }
 
   void _emitError(String message) {
-    print('Error: $message');
+    logger.severe('Error: $message');
   }
 
   void _initializeTls() {
@@ -189,10 +191,10 @@ abstract class SslSocket implements forge.TlsHandler {
   void tlsDataReady(forge.TlsConnection connection) {
     forge.ByteBuffer data = connection.tlsData;
 
-    // Use dynamic to avoid warning assigning ByteBuffer to ArrayBuffer
-    dynamic buffer = _fromString(data.getBytes());
-
-    chrome.sockets.tcp.send(_socketId, buffer)
+    chrome.sockets.tcp.send(
+        _socketId,
+        _fromString(data)
+      )
       .then((info) {
         int resultCode = info.resultCode;
 
@@ -217,7 +219,7 @@ abstract class SslSocket implements forge.TlsHandler {
   }
 
   void dataReady(forge.TlsConnection connection) {
-    _emit(_dataStream, _fromString(connection.data.getBytes()));
+    _emit(_dataStream, _fromString(connection.data));
   }
 
   void closed(forge.TlsConnection connection) {

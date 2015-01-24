@@ -44,7 +44,7 @@ void main() {
     });
 
     querySelector('#send-request').onClick.listen((event) {
-      logger.info('Sending query request');
+      logger.info('Sending discovery query');
 
       Discoverer discoverer = new ChainedDiscoverer([
         new LocalDiscoverer(21025),
