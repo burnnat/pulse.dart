@@ -1,11 +1,15 @@
-library pulsefs.interface;
+library pulsefs.main_interface;
 
 import 'dart:html';
 import 'dart:js';
 
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
+
+import 'package:pulsefs/background.dart';
+import 'package:pulsefs/bep.dart';
 import 'package:pulsefs/discovery.dart';
+
 import 'test/test_html.dart';
 
 final Logger logger = new Logger('pulsefs');
@@ -55,7 +59,9 @@ void main() {
         .locate(new DeviceId(idString))
         .then((address) {
           logger.info('Located address: $address');
-        });
+          return new BlockSocket(background.device)..connectToAddress(address);
+        })
+        .then((_) => discoverer.close());
     });
   }
 }

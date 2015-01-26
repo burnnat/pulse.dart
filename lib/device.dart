@@ -1,36 +1,44 @@
 library pulsefs.device;
 
 import 'dart:async';
+import 'dart:js';
 
 import 'package:logging/logging.dart';
 import 'package:forge/forge.dart' as forge;
 import 'package:chrome/chrome_app.dart' as chrome;
 
+import 'global.dart';
+
 final Logger logger = new Logger('pulsefs.device');
 
-class LocalDevice {
+class LocalDevice extends Global<LocalDevice> {
+
+  static GlobalType<LocalDevice> TYPE = new _LocalDeviceType();
+  GlobalType<LocalDevice> get type => TYPE;
 
   static final String _KEY = 'key.pem';
   static final String _CERT = 'cert.pem';
 
   static Future<LocalDevice> fromStorage() {
-    forge.PrivateKey key;
-    forge.Certificate cert;
+    String keyPem;
+    String certPem;
 
     return chrome.storage.local
       .get(['key.pem', 'cert.pem'])
       .then((values) {
         if (values[_KEY] != null && values[_CERT] != null) {
-          key = forge.pki.privateKeyFromPem(values[_KEY]);
-          cert = forge.pki.certificateFromPem(values[_CERT]);
+          logger.info('Loading certificate and key from local storage...');
+          keyPem = values[_KEY];
+          certPem = values[_CERT];
+          logger.info('Certificate and key successfully loaded.');
         }
         else {
           logger.info('Generating key pair...');
           forge.KeyPair keys = forge.pki.rsa.generateKeyPair(bits: 3072);
-          key = keys.privateKey;
+          forge.PrivateKey key = keys.privateKey;
 
           logger.info('Generating certificate...');
-          cert = forge.pki.createCertificate();
+          forge.Certificate cert = forge.pki.createCertificate();
 
           cert.serialNumber = '0';
 
@@ -38,7 +46,7 @@ class LocalDevice {
           cert.validity.notAfter = new DateTime(2049, 12, 31, 23, 59, 59);
 
           List<forge.CertAttribute> attrs = [
-            new forge.CertAttribute.withFullName('CN', 'syncthing')
+            new forge.CertAttribute.withShortName('CN', 'syncthing')
           ];
 
           cert.setSubject(attrs);
@@ -66,17 +74,32 @@ class LocalDevice {
           cert.sign(key);
           logger.info('Certificate generated successfully.');
 
+          keyPem = forge.pki.privateKeyToPem(key);
+          certPem = forge.pki.certificateToPem(cert);
+
           return chrome.storage.local.set({
-            _KEY: forge.pki.privateKeyToPem(key),
-            _CERT: forge.pki.certificateToPem(cert)
+            _KEY: keyPem,
+            _CERT: certPem
           });
         }
       })
-      .then((_) => new LocalDevice(key, cert));
+      .then((_) => new LocalDevice._(keyPem, certPem));
   }
 
-  final forge.PrivateKey key;
-  final forge.Certificate cert;
+  final String keyPem;
+  final String certPem;
 
-  LocalDevice(this.key, this.cert);
+  LocalDevice._(this.keyPem, this.certPem);
+}
+
+class _LocalDeviceType extends GlobalType {
+  static final String _key = 'key';
+  static final String _cert = 'cert';
+
+  LocalDevice fromJs(JsObject object) => new LocalDevice._(object[_key], object[_cert]);
+
+  JsObject toJs(LocalDevice device) => new JsObject.jsify({
+    _key: device.keyPem,
+    _cert: device.certPem
+  });
 }

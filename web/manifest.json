@@ -14,13 +14,15 @@
     "background": {
       "scripts": [
         "background.js",
+        "packages/forge/js/forge.bundle.js",
         "main.dart.js"
       ]
     }
   },
 
   "permissions": [
-    "fileSystemProvider"
+    "fileSystemProvider",
+    "storage"
   ],
 
   "sockets": {

@@ -16,6 +16,10 @@ class FilesystemHandler {
   FilesystemHandler() : this.provider = _initProvider();
 
   void register() {
+    if (provider == null) {
+      return;
+    }
+
     _register('onUnmountRequested', _unmount);
     _register('onGetMetadataRequested', _getMetadata);
     _register('onReadDirectoryRequested', _readDirectory);

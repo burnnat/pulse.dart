@@ -1,9 +1,10 @@
 import 'dart:js';
 
 import 'package:logging/logging.dart';
+import 'package:pulsefs/background.dart';
 
-import 'background.dart' as background;
-import 'interface.dart' as interface;
+import 'main_background.dart' as main_background;
+import 'main_interface.dart' as main_interface;
 
 void main() {
   Logger.root.level = Level.ALL;
@@ -11,11 +12,17 @@ void main() {
     print('${rec.level.name}: ${rec.time}: ${rec.message}');
   });
 
-  // This value is set by the accompanying script, background.js
-  if (context['isBackground']) {
-    background.main();
-  }
-  else {
-    interface.main();
-  }
+  ChromeBackground
+    .create()
+    .then((bg) {
+      background = bg;
+
+      // This value is set by the accompanying script, background.js
+      if (context['isBackground']) {
+        main_background.main();
+      }
+      else {
+        main_interface.main();
+      }
+    });
 }

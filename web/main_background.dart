@@ -1,23 +1,22 @@
-library pulsefs.background;
+library pulsefs.main_background;
+
+import 'dart:js';
 
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
 
+import 'package:pulsefs/background.dart';
 import 'package:pulsefs/device.dart';
 import 'package:pulsefs/handler.dart';
 
 final Logger logger = new Logger('pulsefs');
-
-LocalDevice device;
 
 void main() {
   logger.info('Executing background script');
 
   LocalDevice
     .fromStorage()
-    .then((loaded) {
-      device = loaded;
-    });
+    .then((device) => background.device = device);
 
   new FilesystemHandler().register();
 

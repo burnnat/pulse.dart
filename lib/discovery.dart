@@ -15,6 +15,7 @@ final Logger logger = new Logger('pulsefs.discovery');
 
 abstract class Discoverer {
   Future<Address> locate(DeviceId device);
+  void close();
 }
 
 class ChainedDiscoverer extends Discoverer {
@@ -51,6 +52,11 @@ class ChainedDiscoverer extends Discoverer {
     });
 
     return completer.future;
+  }
+
+  @override
+  void close() {
+    _discoverers.forEach((discoverer) => discoverer.close());
   }
 }
 
@@ -126,6 +132,12 @@ abstract class UdpDiscoverer extends Discoverer {
     DiscoveryMessage message = new DiscoveryMessage.fromBytes(info.data.getBytes());
     logger.fine('Received message: ${message.payload}');
     return message;
+  }
+
+  void close() {
+    if (_socket != null) {
+      chrome.sockets.udp.close(_socket);
+    }
   }
 }
 

@@ -1,9 +1,11 @@
 name: pulsefs
 description: Pulse client for Chrome OS
 dependencies:
-  # forge:
-  #   git: git://github.com/burnnat/forge.dart
+  forge:
+    path: ../forge.dart
   chrome: any
+  chrome_ssl:
+    path: ../chrome_ssl.dart
   base32: any
   logging: any
   quiver: any
@@ -11,3 +13,6 @@ dev_dependencies:
   unittest: any
 transformers:
 - chrome
+- $dart2js:
+    $include: "web/main.dart"
+    csp: true
