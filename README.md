@@ -1,4 +1,4 @@
-pulse.dart
+syncthing.dart
 ==========
 
-Dart implementation of a Pulse client for Chrome OS
+Dart implementation of a Syncthing client for Chrome OS.

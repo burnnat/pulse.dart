@@ -1,4 +1,4 @@
-library pulsefs.global;
+library syncthing.global;
 
 import 'dart:js';
 

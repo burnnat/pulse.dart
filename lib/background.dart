@@ -1,4 +1,4 @@
-library pulsefs.background;
+library syncthing.background;
 
 import 'dart:async';
 import 'dart:js';

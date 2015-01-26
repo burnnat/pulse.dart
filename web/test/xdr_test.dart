@@ -1,7 +1,7 @@
-library pulse.xdr_test;
+library syncthing.xdr_test;
 
 import 'dart:typed_data';
-import 'package:pulsefs/xdr.dart';
+import 'package:syncthing/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {

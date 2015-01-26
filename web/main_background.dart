@@ -1,15 +1,15 @@
-library pulsefs.main_background;
+library syncthing.main_background;
 
 import 'dart:js';
 
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
 
-import 'package:pulsefs/background.dart';
-import 'package:pulsefs/device.dart';
-import 'package:pulsefs/handler.dart';
+import 'package:syncthing/background.dart';
+import 'package:syncthing/device.dart';
+import 'package:syncthing/handler.dart';
 
-final Logger logger = new Logger('pulsefs');
+final Logger logger = new Logger('syncthing');
 
 void main() {
   logger.info('Executing background script');

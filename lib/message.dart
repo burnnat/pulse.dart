@@ -1,7 +1,7 @@
-library pulsefs.message;
+library syncthing.message;
 
 import 'dart:typed_data';
-import 'package:pulsefs/xdr.dart';
+import 'package:syncthing/xdr.dart';
 
 abstract class Message {
   const Message();

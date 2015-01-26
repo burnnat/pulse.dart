@@ -1,4 +1,4 @@
-library pulsefs.main_interface;
+library syncthing.main_interface;
 
 import 'dart:html';
 import 'dart:js';
@@ -6,13 +6,13 @@ import 'dart:js';
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
 
-import 'package:pulsefs/background.dart';
-import 'package:pulsefs/bep.dart';
-import 'package:pulsefs/discovery.dart';
+import 'package:syncthing/background.dart';
+import 'package:syncthing/bep.dart';
+import 'package:syncthing/discovery.dart';
 
 import 'test/test_html.dart';
 
-final Logger logger = new Logger('pulsefs');
+final Logger logger = new Logger('syncthing');
 
 void main() {
   Logger.root.onRecord.listen((LogRecord rec) {

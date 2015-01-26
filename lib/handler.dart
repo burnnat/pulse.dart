@@ -1,11 +1,11 @@
-library pulsefs.handler;
+library syncthing.handler;
 
 import 'dart:js';
 
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
 
-final Logger logger = new Logger('pulsefs.handler');
+final Logger logger = new Logger('syncthing.handler');
 
 typedef void EventHandler(JsObject options, JsFunction success, JsFunction error);
 

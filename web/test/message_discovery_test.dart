@@ -1,9 +1,9 @@
-library pulse.message_discovery_test;
+library syncthing.message_discovery_test;
 
 import 'dart:typed_data';
 
-import 'package:pulsefs/message_discovery.dart';
-import 'package:pulsefs/xdr.dart';
+import 'package:syncthing/message_discovery.dart';
+import 'package:syncthing/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {

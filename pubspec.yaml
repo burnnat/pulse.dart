@@ -1,5 +1,5 @@
-name: pulsefs
-description: Pulse client for Chrome OS
+name: syncthing
+description: Syncthing client for Chrome OS
 dependencies:
   forge:
     path: ../forge.dart

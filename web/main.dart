@@ -1,7 +1,7 @@
 import 'dart:js';
 
 import 'package:logging/logging.dart';
-import 'package:pulsefs/background.dart';
+import 'package:syncthing/background.dart';
 
 import 'main_background.dart' as main_background;
 import 'main_interface.dart' as main_interface;

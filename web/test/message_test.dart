@@ -1,8 +1,8 @@
-library pulse.message_test;
+library syncthing.message_test;
 
 import 'dart:typed_data';
-import 'package:pulsefs/message.dart';
-import 'package:pulsefs/xdr.dart';
+import 'package:syncthing/message.dart';
+import 'package:syncthing/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 class TestMessage extends BlockMessage {

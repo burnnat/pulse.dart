@@ -1,4 +1,4 @@
-library pulsefs.message_discovery;
+library syncthing.message_discovery;
 
 import 'dart:typed_data';
 
@@ -6,9 +6,9 @@ import 'package:base32/base32.dart';
 import 'package:quiver/check.dart';
 import 'package:quiver/iterables.dart';
 
-import 'package:pulsefs/luhn.dart' as luhn;
-import 'package:pulsefs/message.dart';
-import 'package:pulsefs/xdr.dart';
+import 'package:syncthing/luhn.dart' as luhn;
+import 'package:syncthing/message.dart';
+import 'package:syncthing/xdr.dart';
 
 class DiscoveryMessage extends Message {
   final DiscoveryPayload payload;

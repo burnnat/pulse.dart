@@ -1,6 +1,6 @@
-library pulse.luhn_test;
+library syncthing.luhn_test;
 
-import 'package:pulsefs/luhn.dart';
+import 'package:syncthing/luhn.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {

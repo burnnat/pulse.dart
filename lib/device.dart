@@ -1,4 +1,4 @@
-library pulsefs.device;
+library syncthing.device;
 
 import 'dart:async';
 import 'dart:js';
@@ -9,7 +9,7 @@ import 'package:chrome/chrome_app.dart' as chrome;
 
 import 'global.dart';
 
-final Logger logger = new Logger('pulsefs.device');
+final Logger logger = new Logger('syncthing.device');
 
 class LocalDevice extends Global<LocalDevice> {
 

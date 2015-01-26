@@ -1,9 +1,9 @@
-library pulsefs.xdr;
+library syncthing.xdr;
 
 @MirrorsUsed(targets: const[
-  'pulsefs.xdr',
-  'pulsefs.message',
-  'pulsefs.message_discovery'
+  'syncthing.xdr',
+  'syncthing.message',
+  'syncthing.message_discovery'
 ])
 import 'dart:mirrors';
 import 'dart:typed_data';

@@ -1,17 +1,17 @@
-library pulsefs.discovery;
+library syncthing.discovery;
 
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:pulsefs/message_discovery.dart';
-export 'package:pulsefs/message_discovery.dart' show DeviceId, Address, IP;
-export 'package:pulsefs/xdr.dart' show Int;
+import 'package:syncthing/message_discovery.dart';
+export 'package:syncthing/message_discovery.dart' show DeviceId, Address, IP;
+export 'package:syncthing/xdr.dart' show Int;
 
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;
 import 'package:quiver/async.dart';
 
-final Logger logger = new Logger('pulsefs.discovery');
+final Logger logger = new Logger('syncthing.discovery');
 
 abstract class Discoverer {
   Future<Address> locate(DeviceId device);

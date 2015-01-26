@@ -1,4 +1,4 @@
-library pulsefs.luhn;
+library syncthing.luhn;
 
 import 'package:quiver/check.dart';
 
