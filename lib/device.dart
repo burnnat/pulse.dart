@@ -84,7 +84,7 @@ class LocalDevice {
           });
         }
       })
-      .then((_) => logger.info('Device ID: $device'))
+      .then((_) => logger.info('Device ID: ${device.id}'))
       .then((_) => device);
   }
 

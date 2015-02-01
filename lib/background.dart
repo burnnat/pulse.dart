@@ -3,6 +3,7 @@ library syncthing.background;
 import 'dart:async';
 import 'dart:js';
 import 'dart:html';
+import 'dart:mirrors';
 
 import 'package:chrome/chrome_app.dart' as chrome;
 import 'package:observe/observe.dart';
@@ -52,7 +53,7 @@ abstract class ChromeBackgroundPage extends ChangeNotifier {
 
   void onGlobalUpdate(CustomEvent e) {
     Symbol key = e.detail[UPDATE_KEY];
-    logger.finer(() => 'Global property updated: $key');
+    logger.finer(() => 'Global property updated: ${_name(key)}');
 
     Object original = cast(key, e.detail[UPDATE_OLD_VALUE]);
     Object modified = cast(key, e.detail[UPDATE_NEW_VALUE]);
@@ -67,17 +68,21 @@ abstract class ChromeBackgroundPage extends ChangeNotifier {
         UPDATE_EVENT,
         detail: {
           UPDATE_KEY: key,
-          UPDATE_OLD_VALUE: _page[key],
+          UPDATE_OLD_VALUE: raw(key),
           UPDATE_NEW_VALUE: value
         }
     );
 
-    _page[key] = value;
+    _page[_name(key)] = value;
     _page.callMethod('dispatchEvent', [event]);
   }
 
-  dynamic retrieve(Symbol key) => cast(key, _page[key]);
+  dynamic retrieve(Symbol key) => cast(key, raw(key));
+
+  JsObject raw(Symbol key) => _page[_name(key)];
   dynamic cast(Symbol key, JsObject raw) => _types[key].readGlobal(raw);
+
+  static String _name(Symbol key) => MirrorSystem.getName(key);
 }
 
 abstract class BackgroundStorage {
