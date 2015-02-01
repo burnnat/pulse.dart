@@ -6,13 +6,20 @@ dependencies:
   chrome: any
   chrome_ssl:
     path: ../chrome_ssl.dart
+  polymer: any
   base32: any
   logging: any
   quiver: any
 dev_dependencies:
   unittest: any
+dependency_overrides:
+  # The base32 package specifies an old version of unittest as a direct
+  # dependency rather than using dev_dependencies, so we manually override it.
+  unittest: ">=0.11.0"
 transformers:
-- chrome
+- polymer:
+    entry_points: "web/index.html"
+    csp: true
 - $dart2js:
-    $include: "web/main.dart"
+    $exclude: ["test/test.dart", "web/main_interface.dart"]
     csp: true

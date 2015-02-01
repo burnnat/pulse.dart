@@ -1,7 +1,8 @@
 library syncthing.xdr_test;
 
 import 'dart:typed_data';
-import 'package:syncthing/xdr.dart';
+
+import 'package:syncthing/protocol/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {

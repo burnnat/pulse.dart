@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<link rel="import" href="../packages/polymer/polymer.html">
+
+<polymer-element name="syncthing-log">
+  <template>
+    <style>
+    </style>
+    <template repeat="{{ message in messages }}">
+      <div>{{ message }}</div>
+    </template>
+  </template>
+  <script type="application/dart" src="syncthing_log.dart"></script>
+</polymer-element>

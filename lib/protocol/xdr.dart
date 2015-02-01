@@ -1,9 +1,9 @@
-library syncthing.xdr;
+library syncthing.protocol.xdr;
 
 @MirrorsUsed(targets: const[
-  'syncthing.xdr',
-  'syncthing.message',
-  'syncthing.message_discovery'
+  'syncthing.protocol.xdr',
+  'syncthing.protocol.message',
+  'syncthing.protocol.discovery'
 ])
 import 'dart:mirrors';
 import 'dart:typed_data';

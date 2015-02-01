@@ -1,8 +1,9 @@
 library syncthing.message_test;
 
 import 'dart:typed_data';
-import 'package:syncthing/message.dart';
-import 'package:syncthing/xdr.dart';
+
+import 'package:syncthing/protocol/message.dart';
+import 'package:syncthing/protocol/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 class TestMessage extends BlockMessage {

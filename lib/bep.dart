@@ -1,11 +1,11 @@
 library syncthing.bep;
 
-import 'device.dart';
-import 'message_discovery.dart';
-
 import 'package:chrome_ssl/chrome_ssl.dart';
 import 'package:forge/forge.dart';
 import 'package:logging/logging.dart';
+
+import 'protocol/types.dart';
+import 'device.dart';
 
 final Logger logger = new Logger('syncthing.bep');
 

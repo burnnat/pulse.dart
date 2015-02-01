@@ -13,9 +13,8 @@
   "app": {
     "background": {
       "scripts": [
-        "background.js",
         "packages/forge/js/forge.bundle.js",
-        "main.dart.js"
+        "main_background.dart.js"
       ]
     }
   },

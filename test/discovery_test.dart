@@ -1,9 +1,10 @@
-library syncthing.message_discovery_test;
+library syncthing.discovery_test;
 
 import 'dart:typed_data';
 
-import 'package:syncthing/message_discovery.dart';
-import 'package:syncthing/xdr.dart';
+import 'package:syncthing/protocol/discovery.dart';
+import 'package:syncthing/protocol/types.dart';
+import 'package:syncthing/protocol/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {
@@ -23,18 +24,6 @@ void runTests() {
     0x33, 0x08, 0x73, 0xC9,
     0xA6, 0xF9, 0xB2, 0x05
   ];
-
-  group('Device ID', () {
-    test('serializes from human-readable format', () {
-      DeviceId id = new DeviceId(idString);
-      expect(id.toBytes(), equals(idBytes));
-    });
-
-    test('deserializes to human-readable format', () {
-      DeviceId id = new DeviceId.fromBytes(idBytes);
-      expect(id.toString(), equals(idString));
-    });
-  });
 
   group('Announcement message', () {
     String idString2 = 'MFZWI3D-BONSGYC-YLTMRWG-C43ENR5-QXGZDMM-FZWI3DP-BONSGYY-LTMRWAD';

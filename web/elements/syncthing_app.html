@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<link rel="import" href="../packages/polymer/polymer.html">
+
+<link rel="import" href="syncthing_log.html">
+
+<polymer-element name="syncthing-app">
+  <template>
+    <div>Device ID: {{ globals.device | formatDeviceId }}</div>
+    <button type="button" on-click="{{ generateDevice }}">Generate Device ID</button>
+    <button type="button" on-click="{{ logMessage }}">Log Message</button>
+    <syncthing-log></syncthing-log>
+  </template>
+  <script type="application/dart" src="syncthing_app.dart"></script>
+</polymer-element>

@@ -1,21 +1,14 @@
 <!DOCTYPE html>
-
 <html>
   <head>
     <meta charset="utf-8">
     <title>Syncthing</title>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-
-  <body>
-    <div id="root">
-      <input type="button" id="mount-device" value="Mount Device"></input>
-      <input type="button" id="send-request" value="Send Request"></input>
-      <div id="logs"></div>
-    </div>
-
-    <script src="packages/chrome/bootstrap.js" defer></script>
     <script src="packages/forge/js/forge.bundle.js" async></script>
-    <script src="main.dart" type="application/dart"></script>
+    <link rel="import" href="elements/syncthing_app.html">
+    <script src="packages/syncthing/mock/mock.js" async></script>
+  </head>
+  <body>
+    <syncthing-app></syncthing-app>
+    <script src="main_interface.dart" type="application/dart"></script>
   </body>
 </html>

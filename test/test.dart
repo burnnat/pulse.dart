@@ -1,24 +1,27 @@
-import 'dart:isolate';
+import 'package:logging/logging.dart';
+import 'package:unittest/unittest.dart';
+import 'package:unittest/html_enhanced_config.dart';
 
-import 'package:unittest/unittest.dart' as unittest;
-import '../web/test/test.dart';
+import 'background_test.dart' as background;
+import 'discovery_test.dart' as discovery;
+import 'luhn_test.dart' as luhn;
+import 'message_test.dart' as message;
+import 'types_test.dart' as types;
+import 'xdr_test.dart' as xdr;
 
-class WaitConfiguration extends unittest.SimpleConfiguration {
-  final SendPort port;
+void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+  });
 
-  WaitConfiguration(this.port);
+  useHtmlEnhancedConfiguration();
+  unittestConfiguration.timeout = const Duration(seconds: 2);
 
-  void onDone(bool passed) {
-    try {
-      super.onDone(passed);
-    }
-    finally {
-      port.send(passed);
-    }
-  }
-}
-
-void main(List<String> args, SendPort port) {
-  unittest.unittestConfiguration = new WaitConfiguration(port);
-  runTests();
+  background.runTests();
+  discovery.runTests();
+  luhn.runTests();
+  message.runTests();
+  types.runTests();
+  xdr.runTests();
 }

@@ -3,9 +3,10 @@ library syncthing.discovery;
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:syncthing/message_discovery.dart';
-export 'package:syncthing/message_discovery.dart' show DeviceId, Address, IP;
-export 'package:syncthing/xdr.dart' show Int;
+import 'protocol/discovery.dart';
+import 'protocol/types.dart';
+export 'protocol/types.dart' show DeviceId, Address, IP;
+export 'protocol/xdr.dart' show Int;
 
 import 'package:logging/logging.dart';
 import 'package:chrome/chrome_app.dart' as chrome;

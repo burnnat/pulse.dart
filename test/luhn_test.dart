@@ -1,6 +1,6 @@
 library syncthing.luhn_test;
 
-import 'package:syncthing/luhn.dart';
+import 'package:syncthing/protocol/luhn.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {

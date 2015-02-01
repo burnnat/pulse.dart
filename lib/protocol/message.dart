@@ -1,7 +1,8 @@
-library syncthing.message;
+library syncthing.protocol.message;
 
 import 'dart:typed_data';
-import 'package:syncthing/xdr.dart';
+
+import 'xdr.dart';
 
 abstract class Message {
   const Message();

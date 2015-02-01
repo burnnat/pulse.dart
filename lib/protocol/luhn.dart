@@ -1,4 +1,4 @@
-library syncthing.luhn;
+library syncthing.protocol.luhn;
 
 import 'package:quiver/check.dart';
 
