@@ -12,10 +12,6 @@ dependencies:
   quiver: any
 dev_dependencies:
   unittest: any
-dependency_overrides:
-  # The base32 package specifies an old version of unittest as a direct
-  # dependency rather than using dev_dependencies, so we manually override it.
-  unittest: ">=0.11.0"
 transformers:
 - polymer:
     entry_points: "web/index.html"
