@@ -7,6 +7,7 @@ dependencies:
   chrome_ssl:
     path: ../chrome_ssl.dart
   polymer: any
+  paper_elements: any
   base32: any
   logging: any
   quiver: any

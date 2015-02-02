@@ -3,6 +3,8 @@ library syncthing.background;
 import 'dart:async';
 import 'dart:js';
 import 'dart:html';
+
+@MirrorsUsed(symbols: 'device')
 import 'dart:mirrors';
 
 import 'package:chrome/chrome_app.dart' as chrome;

@@ -3,7 +3,6 @@ library syncthing.bep_test;
 import 'dart:typed_data';
 
 import 'package:syncthing/protocol/bep.dart';
-import 'package:syncthing/protocol/xdr.dart';
 import 'package:unittest/unittest.dart';
 
 void runTests() {

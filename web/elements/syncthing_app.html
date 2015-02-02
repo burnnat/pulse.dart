@@ -1,14 +1,70 @@
 <!DOCTYPE html>
 <link rel="import" href="../packages/polymer/polymer.html">
 
+<link rel="import" href="../packages/core_elements/core_input.html">
+<link rel="import" href="../packages/paper_elements/paper_button.html">
+<link rel="import" href="../packages/paper_elements/paper_input_decorator.html">
+
 <link rel="import" href="syncthing_log.html">
 
 <polymer-element name="syncthing-app">
+  <style>
+    body {
+      font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      font-size: 14px;
+    }
+  </style>
   <template>
-    <div>Device ID: {{ globals.device | formatDeviceId }}</div>
-    <button type="button" on-click="{{ generateDevice }}">Generate Device ID</button>
-    <button type="button" on-click="{{ logMessage }}">Log Message</button>
-    <syncthing-log></syncthing-log>
+    <div vertical layout>
+      <div horizontal layout>
+        <paper-button on-click="{{ loadLocalDevice }}">Load Local Device</paper-button>
+        <div flex self-center>Device ID: {{ globals.device | formatDeviceId }}</div>
+      </div>
+      <div horizontal layout>
+        <paper-input-decorator
+          label="Device ID"
+          error="Must be a valid device ID"
+          isInvalid="{{ !$['deviceId'].validity.valid }}"
+          flex>
+            <input
+              id="deviceId"
+              is="core-input"
+              value="{{ deviceId }}"
+              pattern="[A-Z2-7]{7}(-[A-Z2-7]{7}){7}"
+              required>
+        </paper-input-decorator>
+        <paper-button on-click="{{ resolveDevice }}" self-start>Resolve</paper-button>
+      </div>
+      <div horizontal layout>
+        <paper-input-decorator
+          label="IP Address"
+          error="Must be a valid IPv4 address"
+          isInvalid="{{ !$['address'].validity.valid }}"
+          self-start
+          flex>
+            <input
+              id="address"
+              is="core-input"
+              value="{{ address }}"
+              pattern="(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))"
+              required>
+        </paper-input-decorator>
+        <paper-input-decorator
+          label="Port"
+          error="Must be a valid port number"
+          isInvalid="{{ !$['port'].validity.valid }}"
+          self-start>
+            <input
+              id="port"
+              is="core-input"
+              value="{{ port }}"
+              pattern="\d+"
+              required>
+        </paper-input-decorator>
+        <paper-button on-click="{{ connectDevice }}" self-start>Connect</paper-button>
+      </div>
+      <syncthing-log flex></syncthing-log>
+    </div>
   </template>
   <script type="application/dart" src="syncthing_app.dart"></script>
 </polymer-element>

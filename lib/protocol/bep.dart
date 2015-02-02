@@ -6,6 +6,7 @@ import 'package:logging/logging.dart';
 
 import 'message.dart';
 import 'xdr.dart';
+export 'xdr.dart' show XdrString, Hyper;
 
 final Logger logger = new Logger('syncthing.protocol.bep');
 
@@ -143,6 +144,7 @@ abstract class BlockPayload extends XdrPayload {
   BlockPayload.fromBytes(this.type, List<int> bytes) : super.fromBytes(bytes);
 }
 
+@xdr
 class ClusterConfig extends BlockPayload {
   static const int TYPE = 0;
 
@@ -161,6 +163,7 @@ class ClusterConfig extends BlockPayload {
   ClusterConfig.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
 }
 
+@xdr
 class Folder extends XdrPayload {
   XdrString id;
   List<Device> devices;
@@ -169,6 +172,7 @@ class Folder extends XdrPayload {
   Folder.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
+@xdr
 class Device extends XdrPayload {
   XdrString id;
   Flags flags;
@@ -225,6 +229,7 @@ class Flags extends XdrPayload {
   }
 }
 
+@xdr
 class Option extends XdrPayload {
   XdrString key;
   XdrString value;
