@@ -6,13 +6,25 @@ import 'package:syncthing/protocol/message.dart';
 import 'package:syncthing/protocol/xdr.dart';
 import 'package:unittest/unittest.dart';
 
-class TestMessage extends BlockMessage {
+class TestMessage extends Message {
+  final int header;
   final TestPayload payload;
 
-  TestMessage(int version, int id, int type, this.payload, bool compress)
-    : super(version, id, type, compress);
+  TestMessage(this.header, this.payload);
 
-  XdrPayload getPayload() => payload;
+  ByteBuffer toBuffer() {
+    Uint32List payloadData = new Uint32List.view(payload.toBuffer());
+    Uint32List data = new Uint32List(payloadData.length + 2);
+
+    // Write message header
+    data[0] = header;
+    data[1] = payloadData.lengthInBytes;
+
+    // Append message contents
+    data.setRange(2, data.length, payloadData);
+
+    return data.buffer;
+  }
 }
 
 class TestPayload extends XdrPayload {
@@ -25,26 +37,21 @@ class TestPayload extends XdrPayload {
 
 void runTests() {
   group('Base message', () {
+    int header = 0x189C0700;
+
     Uint32List payload = new Uint32List(3);
     payload[0] = 0xFF00FF00;
     payload[1] = 0x01234567;
     payload[2] = 0x994E0126;
 
-    TestMessage m = new TestMessage(
-      1,
-      2204,
-      BlockMessage.TYPE_CLOSE,
-      new TestPayload(payload),
-      false
-    );
-
+    TestMessage m = new TestMessage(header, new TestPayload(payload));
     Uint32List data = new Uint32List.view(m.toBuffer());
 
     test('has correct size', () {
       expect(data, hasLength(payload.length + 2));
     });
 
-    test('encodes header', () => expect(data[0], equals(0x189C0700)));
+    test('encodes header', () => expect(data[0], equals(header)));
     test('encodes length', () => expect(data[1], equals(payload.lengthInBytes)));
 
     test('encodes payload', () {

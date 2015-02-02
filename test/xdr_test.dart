@@ -7,6 +7,18 @@ import 'package:unittest/unittest.dart';
 
 void runTests() {
   group('XDR format', () {
+    test('calculates pdding', () {
+      expect(calculatePadding(0), equals(0));
+      expect(calculatePadding(1), equals(3));
+      expect(calculatePadding(2), equals(2));
+      expect(calculatePadding(3), equals(1));
+      expect(calculatePadding(4), equals(0));
+      expect(calculatePadding(5), equals(3));
+      expect(calculatePadding(6), equals(2));
+      expect(calculatePadding(7), equals(1));
+      expect(calculatePadding(8), equals(0));
+    });
+
     test('encodes Short', () {
       // should be truncated to a 16-bit Short
       Short s = new Short(0xABB86EB3);

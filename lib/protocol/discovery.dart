@@ -28,11 +28,7 @@ class DiscoveryMessage extends Message {
 
   DiscoveryMessage.fromBytes(List<int> bytes) : this(_parsePayload(bytes));
 
-  @override
-  ByteBuffer toBuffer() => getPayload().toBuffer();
-
-  @override
-  XdrPayload getPayload() => payload;
+  ByteBuffer toBuffer() => payload.toBuffer();
 }
 
 abstract class DiscoveryPayload extends XdrPayload {

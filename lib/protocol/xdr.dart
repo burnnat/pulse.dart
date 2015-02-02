@@ -9,15 +9,21 @@ import 'dart:mirrors';
 import 'dart:typed_data';
 import 'dart:convert';
 
+import 'package:logging/logging.dart';
 import 'package:quiver/collection.dart';
 import 'package:quiver/iterables.dart';
 
+final Logger logger = new Logger('syncthing.protocol.xdr');
+
+const Object transient = const _Transient();
+class _Transient {
+  static TypeMirror type = reflectClass(_Transient);
+  const _Transient();
+}
+
 class XdrEncodingException implements Exception {
   final Object value;
-
   const XdrEncodingException(this.value);
-
-  @override
   String toString() => 'Unable to encode value: $value';
 }
 
@@ -26,40 +32,55 @@ abstract class XdrPayload {
 
   InstanceMirror _getMirror() => reflect(this);
 
-  static Iterable<ClassMirror> _supertypes(TypeMirror type)
-    => new GeneratingIterable<ClassMirror>(
+  static Iterable<ClassMirror> _supertypes(TypeMirror type) =>
+    new GeneratingIterable<ClassMirror>(
       () => type,
       (prev) => prev.superclass
     );
 
-  static Iterable<VariableMirror> _dataFieldsFor(InstanceMirror mirror)
-    => _supertypes(mirror.type)
+  static Iterable<VariableMirror> _dataFieldsFor(InstanceMirror mirror) =>
+    _supertypes(mirror.type)
       .toList()
       // Reverse so superclass fields are added first
       .reversed
       .map((type) => type.declarations)
-      .expand((declarations) {
-        return declarations.values
-          .where((declaration) => declaration is VariableMirror && !declaration.isStatic);
-      });
+      .expand((declarations) =>
+        declarations
+          .values
+          .where(
+            (declaration) =>
+              declaration is VariableMirror &&
+              !declaration.isStatic &&
+              !declaration.metadata.any(
+                (annotation) => annotation.type == _Transient.type
+              )
+          )
+      );
 
-  static Object _instantiate(TypeMirror type, List<int> bytes)
-    => (type as ClassMirror)
+  static Object _instantiate(TypeMirror type, List<int> bytes) =>
+    (type as ClassMirror)
       .newInstance(
         new Symbol('fromBytes'),
         [bytes]
       ).reflectee;
 
-  bool _hasSupertype(TypeMirror target, TypeMirror reference)
-    => _supertypes(target).any((type) => type == reference);
+  bool _hasSupertype(TypeMirror target, TypeMirror reference) =>
+    _supertypes(target).any((type) => type == reference);
+
+  static String _nameFor(DeclarationMirror mirror) =>
+    MirrorSystem.getName(mirror.simpleName);
 
   XdrPayload.fromBytes(List<int> bytes) {
     InstanceMirror mirror = _getMirror();
+
+    logger.finest(() => 'Parsing XDR payload of type: ${_nameFor(mirror.type)}');
 
     _dataFieldsFor(mirror)
       .forEach((declaration) {
         TypeMirror type = declaration.type;
         Object value;
+
+        logger.finest(() => 'Parsing field ${_nameFor(declaration)} with type: ${_nameFor(type)}');
 
         // First check if the field is a list. Normally, we would use:
         // if (type.isSubtypeOf(reflectType(List))) {
@@ -67,6 +88,8 @@ abstract class XdrPayload {
         if (type.originalDeclaration == reflectType(List).originalDeclaration) {
           Int length = new Int.fromBytes(bytes);
           TypeMirror elementType = type.typeArguments.first;
+
+          logger.finest(() => 'Expecting ${length.value} elements of type: ${_nameFor(elementType)}');
 
           value = new List.generate(
             length.value,
@@ -116,22 +139,6 @@ abstract class XdrPayload {
     }
   }
 
-  List<int> pad(List<int> data) {
-    int length = data.length;
-    int padding = 4 - (length % 4);
-
-    if (padding == 4) {
-      return data;
-    }
-
-    List<int> padded = new List<int>(length + padding);
-
-    padded.setRange(0, length, data);
-    padded.fillRange(length, padded.length, 0);
-
-    return padded;
-  }
-
   @override
   String toString() {
     InstanceMirror mirror = _getMirror();
@@ -150,6 +157,25 @@ abstract class XdrPayload {
 
     return '$type($fields)';
   }
+}
+
+int calculatePadding(int length) =>
+  3 - ((length + 3) % 4);
+
+List<int> pad(List<int> data) {
+  int length = data.length;
+  int padding = calculatePadding(length);
+
+  if (padding == 0) {
+    return data;
+  }
+
+  List<int> padded = new List<int>(length + padding);
+
+  padded.setRange(0, length, data);
+  padded.fillRange(length, padded.length, 0);
+
+  return padded;
 }
 
 class Short extends XdrPayload {
@@ -171,13 +197,13 @@ class Int extends XdrPayload {
 
   const Int(this.value);
 
-  Int.fromBytes(List<int> bytes)
-    : this.value = (
-        bytes.removeAt(0) << 24 |
-        bytes.removeAt(0) << 16 |
-        bytes.removeAt(0) << 8  |
-        bytes.removeAt(0)
-      );
+  Int.fromBytes(List<int> bytes) :
+    this.value = (
+      bytes.removeAt(0) << 24 |
+      bytes.removeAt(0) << 16 |
+      bytes.removeAt(0) << 8  |
+      bytes.removeAt(0)
+    );
 
   @override
   List<int> toBytes() {
@@ -196,10 +222,12 @@ class Int extends XdrPayload {
 }
 
 class Hyper extends XdrPayload {
-  final Int upper;
-  final Int lower;
+  Int upper;
+  Int lower;
 
-  const Hyper(this.upper, this.lower);
+  Hyper(this.upper, this.lower);
+
+  Hyper.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 
   Hyper.forValue(int upper, int lower) :
     this.upper = new Int(upper),
@@ -210,9 +238,11 @@ abstract class VariablePayload extends XdrPayload {
   const VariablePayload();
 
   VariablePayload.fromBytes(List<int> bytes) {
-    Int length = new Int.fromBytes(bytes);
-    setData(bytes.sublist(0, length.value));
-    bytes.removeRange(0, length.value);
+    int length = new Int.fromBytes(bytes).value;
+    logger.finest(() => 'Detected variable-length entry of size: $length');
+
+    setData(bytes.sublist(0, length));
+    bytes.removeRange(0, length + calculatePadding(length));
   }
 
   @override
