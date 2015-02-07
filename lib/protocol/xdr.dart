@@ -71,6 +71,9 @@ abstract class XdrPayload {
   static String _nameFor(DeclarationMirror mirror) =>
     MirrorSystem.getName(mirror.simpleName);
 
+  static Object _valueFor(InstanceMirror mirror, DeclarationMirror declaration) =>
+      mirror.getField(declaration.simpleName).reflectee;
+
   XdrPayload.fromBytes(List<int> bytes) {
     InstanceMirror mirror = _getMirror();
 
@@ -121,7 +124,7 @@ abstract class XdrPayload {
     InstanceMirror mirror = _getMirror();
 
     _dataFieldsFor(mirror)
-      .map((declaration) => mirror.getField(declaration.simpleName).reflectee)
+      .map((declaration) => _valueFor(mirror, declaration))
       .forEach((value) => addValue(bytes, value));
 
     return bytes;
@@ -148,10 +151,8 @@ abstract class XdrPayload {
 
     String fields = _dataFieldsFor(mirror)
       .map((declaration) {
-        Symbol symbol = declaration.simpleName;
-        String name = MirrorSystem.getName(symbol);
-        Object value = mirror.getField(symbol).reflectee;
-
+        String name = _nameFor(declaration);
+        Object value = _valueFor(mirror, declaration);
         return '$name=$value';
       })
       .join(', ');
@@ -293,4 +294,6 @@ class XdrString extends VariablePayload {
   void setData(List<int> data) {
     this.value = UTF8.decode(data);
   }
+
+  String toString() => value;
 }

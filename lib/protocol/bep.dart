@@ -64,6 +64,8 @@ class BlockMessage extends Message {
   const BlockMessage(this.id, this.payload, { this.version: 0, this.compressed: false });
 
   factory BlockMessage.fromBytes(List<int> bytes) {
+    bytes = new List.from(bytes);
+
     int version = _nibble(bytes[0], 1);
 
     if (version > 0) {

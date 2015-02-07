@@ -22,10 +22,10 @@ class SyncthingApp extends PolymerElement {
   String deviceId;
 
   @observable
-  String address;
+  String address = '127.0.0.1';
 
   @observable
-  String port;
+  String port = '22000';
 
   SyncthingApp.created() : super.created() {
     globals = background;

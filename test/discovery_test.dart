@@ -96,6 +96,9 @@ void runTests() {
       0x00, 0x00, 0x55, 0xF0, // port 22000
     ]);
 
+    // Make sure messages can be parsed from immutable lists.
+    serialized = new List.from(serialized, growable: false);
+
     test('can serialize to buffer', () {
       DiscoveryMessage message = new DiscoveryMessage(
         new DiscoveryAnnouncement(
@@ -172,6 +175,9 @@ void runTests() {
     ];
 
     serialized.addAll(idBytes);
+
+    // Make sure messages can be parsed from immutable lists.
+    serialized = new List.from(serialized, growable: false);
 
     test('can serialize to buffer', () {
       DiscoveryMessage message = new DiscoveryMessage(

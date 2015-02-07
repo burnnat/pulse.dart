@@ -14,6 +14,9 @@ void runTests() {
         0x00, 0x00, 0x00, 0x00
       ];
 
+      // Make sure messages can be parsed from immutable lists.
+      serialized = new List.from(serialized, growable: false);
+
       expect(
         () => new BlockMessage.fromBytes(serialized),
         throwsA(new isInstanceOf<UnsupportedVersionError>()),
@@ -26,6 +29,9 @@ void runTests() {
         0x08, 0xC2, 0xFF, 0x00,
         0x00, 0x00, 0x00, 0x00
       ];
+
+      // Make sure messages can be parsed from immutable lists.
+      serialized = new List.from(serialized, growable: false);
 
       expect(
         () => new BlockMessage.fromBytes(serialized),
@@ -132,6 +138,9 @@ void runTests() {
       0x52, 0x41, 0x4E, 0x44,
       0x4F, 0x4D, 0x00, 0x00,
     ]);
+
+    // Make sure messages can be parsed from immutable lists.
+    serialized = new List.from(serialized, growable: false);
 
     test('can serialize to buffer', () {
       BlockMessage message = new BlockMessage(
