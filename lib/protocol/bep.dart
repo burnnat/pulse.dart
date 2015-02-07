@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 
 import 'message.dart';
 import 'xdr.dart';
-export 'xdr.dart' show XdrString, Hyper;
+export 'xdr.dart' show XdrString, Hyper, Int, Opaque;
 
 final Logger logger = new Logger('syncthing.protocol.bep');
 
@@ -93,6 +93,10 @@ class BlockMessage extends Message {
     switch (type) {
       case ClusterConfig.TYPE:
         return new ClusterConfig.fromBytes(bytes);
+      case Index.TYPE:
+        return new Index.fromBytes(bytes);
+      case IndexUpdate.TYPE:
+        return new IndexUpdate.fromBytes(bytes);
       default:
         throw new UnknownMessageTypeError(type);
     }
@@ -177,14 +181,14 @@ class Folder extends XdrPayload {
 @xdr
 class Device extends XdrPayload {
   XdrString id;
-  Flags flags;
+  DeviceFlags flags;
   Hyper maxLocalVersion;
 
   Device(this.id, this.flags, this.maxLocalVersion);
   Device.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
-class Flags extends XdrPayload {
+class DeviceFlags extends XdrPayload {
   static const int PRIORITY_HIGH = 0x01;
   static const int PRIORITY_NORMAL = 0x00;
   static const int PRIORITY_LOW = 0x02;
@@ -195,14 +199,14 @@ class Flags extends XdrPayload {
   final bool introducer;
   final int priority;
 
-  const Flags({
+  const DeviceFlags({
     this.trusted: false,
     this.readOnly: false,
     this.introducer: false,
     this.priority: PRIORITY_NORMAL
   });
 
-  factory Flags.fromBytes(List<int> bytes) {
+  factory DeviceFlags.fromBytes(List<int> bytes) {
     int priority = bytes[1] & 0x03;
     bool introducer = _test(bytes[3], 2);
     bool readOnly = _test(bytes[3], 1);
@@ -210,7 +214,7 @@ class Flags extends XdrPayload {
 
     bytes.removeRange(0, 4);
 
-    return new Flags(
+    return new DeviceFlags(
       trusted: trusted,
       readOnly: readOnly,
       introducer: introducer,
@@ -238,4 +242,110 @@ class Option extends XdrPayload {
 
   Option(this.key, this.value);
   Option.fromBytes(List<int> bytes) : super.fromBytes(bytes);
+}
+
+@xdr
+class AbstractIndex extends BlockPayload {
+  XdrString folder;
+  List<FileInfo> files;
+
+  AbstractIndex(int type, this.folder, this.files) : super(type);
+  AbstractIndex.fromBytes(int type, List<int> bytes) : super.fromBytes(type, bytes);
+}
+
+@xdr
+class Index extends AbstractIndex {
+  static const int TYPE = 1;
+
+  Index(XdrString folder, List<FileInfo> files) : super(TYPE, folder, files);
+  Index.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
+}
+
+@xdr
+class IndexUpdate extends AbstractIndex {
+  static const int TYPE = 6;
+
+  IndexUpdate(XdrString folder, List<FileInfo> files) : super(TYPE, folder, files);
+  IndexUpdate.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
+}
+
+@xdr
+class FileInfo extends XdrPayload {
+  XdrString name;
+  FileFlags flags;
+  Hyper modified;
+  Hyper version;
+  Hyper localVersion;
+  List<BlockInfo> blocks;
+
+  FileInfo(
+    this.name,
+    this.flags,
+    this.modified,
+    this.version,
+    this.localVersion,
+    this.blocks);
+
+  FileInfo.fromBytes(List<int> bytes) : super.fromBytes(bytes);
+}
+
+class FileFlags extends XdrPayload {
+  final int permissions;
+  final bool deleted;
+  final bool invalid;
+  final bool permissionsMissing;
+  final bool symbolicLink;
+  final bool undefinedTarget;
+
+  const FileFlags({
+    this.permissions: 0x1B6, // Octal 666
+    this.deleted: false,
+    this.invalid: false,
+    this.permissionsMissing: false,
+    this.symbolicLink: false,
+    this.undefinedTarget: false
+  });
+
+  factory FileFlags.fromBytes(List<int> bytes) {
+    bool undefinedTarget = _test(bytes[1], 0);
+    bool symbolicLink = _test(bytes[2], 7);
+    bool permissionsMissing = _test(bytes[2], 6);
+    bool invalid = _test(bytes[2], 5);
+    bool deleted = _test(bytes[2], 4);
+    int permissions = (_nibble(bytes[2], 0) << 8) | bytes[3];
+
+    bytes.removeRange(0, 4);
+
+    return new FileFlags(
+        permissions: permissions,
+        deleted: deleted,
+        invalid: invalid,
+        permissionsMissing: permissionsMissing,
+        symbolicLink: symbolicLink,
+        undefinedTarget: undefinedTarget
+    );
+  }
+
+  @override
+  List<int> toBytes() {
+    return [
+      0x00,
+      _set(undefinedTarget, 0),
+      _set(symbolicLink, 7) |
+        _set(permissionsMissing, 6) |
+        _set(invalid, 5) |
+        _set(deleted, 4) |
+        _nibble(permissions, 2),
+      _byte(permissions, 0)
+    ];
+  }
+}
+
+@xdr
+class BlockInfo extends XdrPayload {
+  Int size;
+  Opaque hash;
+
+  BlockInfo(this.size, this.hash);
+  BlockInfo.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
