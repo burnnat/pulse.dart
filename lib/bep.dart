@@ -23,7 +23,7 @@ class BlockSocket extends SslSocket {
         _sendMessage(
           new ClusterConfig(
             new XdrString('syncthing.dart'),
-            new XdrString('0.0.1'),
+            new XdrString('v0.0.1'),
             [],
             []
           )
@@ -32,7 +32,7 @@ class BlockSocket extends SslSocket {
 
     this.onData
       .forEach((data) {
-        _parseMessage(data);
+        this._handleMessage(data);
       })
       .then((_) {
         this.close();
@@ -49,14 +49,29 @@ class BlockSocket extends SslSocket {
     connect(address.ip.toString(), address.port.value);
   }
 
-  BlockPayload _parseMessage(chrome.ArrayBuffer data) {
+  void _handleMessage(chrome.ArrayBuffer data) {
     BlockMessage message = new BlockMessage.fromBytes(data.getBytes());
-    logger.fine('Received message ${message.id}: ${message.payload.toString()}');
-    return message.payload;
+
+    int id = message.id;
+    BlockPayload payload = message.payload;
+
+    logger.fine(() => 'Received message $id: $payload');
+
+    if (payload is Ping) {
+      _sendMessage(new Pong(), id);
+    }
+    else if (payload is Close) {
+      logger.info(() => 'Remote connection closed with reason: ${payload.reason.value}');
+      this.close();
+    }
   }
 
-  void _sendMessage(BlockPayload payload) {
-    logger.fine('Sending message ${_messageId}: ${payload.toString()}');
-    this.write(new BlockMessage(_messageId++, payload).toBuffer());
+  void _sendMessage(BlockPayload payload, [int id]) {
+    if (id == null) {
+      id = _messageId++;
+    }
+
+    logger.fine(() => 'Sending message $id: $payload');
+    this.write(new BlockMessage(id, payload).toBuffer());
   }
 }
