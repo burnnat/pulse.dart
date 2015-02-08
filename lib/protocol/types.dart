@@ -60,7 +60,6 @@ class DeviceId extends Opaque {
   }
 }
 
-@xdr
 class Address extends XdrPayload {
   IP ip;
   Int port;

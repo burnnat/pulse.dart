@@ -150,7 +150,6 @@ abstract class BlockPayload extends XdrPayload {
   BlockPayload.fromBytes(this.type, List<int> bytes) : super.fromBytes(bytes);
 }
 
-@xdr
 class ClusterConfig extends BlockPayload {
   static const int TYPE = 0;
 
@@ -169,7 +168,6 @@ class ClusterConfig extends BlockPayload {
   ClusterConfig.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
 }
 
-@xdr
 class Folder extends XdrPayload {
   XdrString id;
   List<Device> devices;
@@ -178,7 +176,6 @@ class Folder extends XdrPayload {
   Folder.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
-@xdr
 class Device extends XdrPayload {
   XdrString id;
   DeviceFlags flags;
@@ -235,7 +232,6 @@ class DeviceFlags extends XdrPayload {
   }
 }
 
-@xdr
 class Option extends XdrPayload {
   XdrString key;
   XdrString value;
@@ -244,7 +240,6 @@ class Option extends XdrPayload {
   Option.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
-@xdr
 class AbstractIndex extends BlockPayload {
   XdrString folder;
   List<FileInfo> files;
@@ -253,7 +248,6 @@ class AbstractIndex extends BlockPayload {
   AbstractIndex.fromBytes(int type, List<int> bytes) : super.fromBytes(type, bytes);
 }
 
-@xdr
 class Index extends AbstractIndex {
   static const int TYPE = 1;
 
@@ -261,7 +255,6 @@ class Index extends AbstractIndex {
   Index.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
 }
 
-@xdr
 class IndexUpdate extends AbstractIndex {
   static const int TYPE = 6;
 
@@ -269,7 +262,6 @@ class IndexUpdate extends AbstractIndex {
   IndexUpdate.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
 }
 
-@xdr
 class FileInfo extends XdrPayload {
   XdrString name;
   FileFlags flags;
@@ -341,7 +333,6 @@ class FileFlags extends XdrPayload {
   }
 }
 
-@xdr
 class BlockInfo extends XdrPayload {
   Int size;
   Opaque hash;

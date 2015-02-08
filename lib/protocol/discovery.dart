@@ -31,7 +31,6 @@ class DiscoveryMessage extends Message {
   ByteBuffer toBuffer() => payload.toBuffer();
 }
 
-@xdr
 abstract class DiscoveryPayload extends XdrPayload {
   Int magic;
 
@@ -39,7 +38,6 @@ abstract class DiscoveryPayload extends XdrPayload {
   DiscoveryPayload.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
-@xdr
 class DiscoveryQuery extends DiscoveryPayload {
   static const Int MAGIC = const Int(0x2CA856F5);
 
@@ -52,7 +50,6 @@ class DiscoveryQuery extends DiscoveryPayload {
     => new DiscoveryMessage(new DiscoveryQuery(deviceId));
 }
 
-@xdr
 class DiscoveryAnnouncement extends DiscoveryPayload {
   static const Int MAGIC = const Int(0x9D79BC39);
 
@@ -63,7 +60,6 @@ class DiscoveryAnnouncement extends DiscoveryPayload {
   DiscoveryAnnouncement.fromBytes(List<int> bytes) : super.fromBytes(bytes);
 }
 
-@xdr
 class Device extends XdrPayload {
   DeviceId id;
   List<Address> addresses;

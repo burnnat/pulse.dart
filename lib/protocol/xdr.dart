@@ -1,6 +1,11 @@
 library syncthing.protocol.xdr;
 
-@MirrorsUsed(metaTargets: xdr)
+@MirrorsUsed(targets: const [
+  'syncthing.protocol.xdr',
+  'syncthing.protocol.types',
+  'syncthing.protocol.discovery',
+  'syncthing.protocol.bep'
+])
 import 'dart:mirrors';
 import 'dart:typed_data';
 import 'dart:convert';
@@ -10,11 +15,6 @@ import 'package:quiver/collection.dart';
 import 'package:quiver/iterables.dart';
 
 final Logger logger = new Logger('syncthing.protocol.xdr');
-
-const Object xdr = const _Xdr();
-class _Xdr {
-  const _Xdr();
-}
 
 const Object transient = const _Transient();
 class _Transient {
