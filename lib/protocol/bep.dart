@@ -5,6 +5,10 @@ import 'dart:typed_data';
 import 'package:logging/logging.dart';
 
 import 'message.dart';
+
+import 'types.dart';
+export 'types.dart' show DeviceId;
+
 import 'xdr.dart';
 export 'xdr.dart' show XdrString, Hyper, Int, Opaque;
 
@@ -177,7 +181,7 @@ class Folder extends XdrPayload {
 }
 
 class Device extends XdrPayload {
-  XdrString id;
+  DeviceId id;
   DeviceFlags flags;
   Hyper maxLocalVersion;
 

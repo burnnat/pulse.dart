@@ -5,7 +5,7 @@ void runConfigTests() {
     // Message header and length
     List<int> serialized = [
       0x08, 0xC2, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0xA4,
+      0x00, 0x00, 0x00, 0xB8,
     ];
 
     serialized.addAll([
@@ -44,11 +44,16 @@ void runConfigTests() {
       0x00, 0x00, 0x00, 0x01,
       // Device #1
       // ID length header
-      0x00, 0x00, 0x00, 0x0C,
-      // ID ("elder-device")
-      0x65, 0x6C, 0x64, 0x65,
-      0x72, 0x2D, 0x64, 0x65,
-      0x76, 0x69, 0x63, 0x65,
+      0x00, 0x00, 0x00, 0x20,
+      // ID data
+      0x7F, 0x7C, 0x87, 0x23,
+      0xEC, 0xCA, 0x5B, 0x4D,
+      0x22, 0x06, 0x1C, 0x49,
+      0x81, 0xB3, 0x4C, 0x34,
+      0xD8, 0x65, 0xEC, 0x37,
+      0x6B, 0xE1, 0xEB, 0x74,
+      0x33, 0x08, 0x73, 0xC9,
+      0xA6, 0xF9, 0xB2, 0x05,
       // Flags
       0x00, 0x01, 0x00, 0x05,
       // Max local version
@@ -99,6 +104,8 @@ void runConfigTests() {
       0x4F, 0x4D, 0x00, 0x00,
     ]);
 
+    String idString = 'P56IOI7-MZJNU2Y-IQGDREY-DM2MGTI-MGL3BXN-PQ6W5BM-TBBZ4TJ-XZWICQ2';
+
     // Make sure messages can be parsed from immutable lists.
     serialized = new List.from(serialized, growable: false);
 
@@ -117,7 +124,7 @@ void runConfigTests() {
                 new XdrString('multiple'),
                 [
                   new Device(
-                    new XdrString('elder-device'),
+                    new DeviceId(idString),
                     new DeviceFlags(
                       priority: DeviceFlags.PRIORITY_HIGH,
                       introducer: true,
@@ -176,7 +183,7 @@ void runConfigTests() {
       expect(devices.length, equals(1));
 
       Device device = devices[0];
-      expect(device.id.value, equals('elder-device'));
+      expect(device.id.toString(), equals(idString));
       expect(device.flags.priority, equals(DeviceFlags.PRIORITY_HIGH));
       expect(device.flags.introducer, isTrue);
       expect(device.flags.readOnly, isFalse);
