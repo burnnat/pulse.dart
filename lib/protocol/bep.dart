@@ -99,8 +99,14 @@ class BlockMessage extends Message {
         return new ClusterConfig.fromBytes(bytes);
       case Index.TYPE:
         return new Index.fromBytes(bytes);
+      case Ping.TYPE:
+        return new Ping.fromBytes(bytes);
+      case Pong.TYPE:
+        return new Pong.fromBytes(bytes);
       case IndexUpdate.TYPE:
         return new IndexUpdate.fromBytes(bytes);
+      case Close.TYPE:
+        return new Close.fromBytes(bytes);
       default:
         throw new UnknownMessageTypeError(type);
     }
@@ -343,4 +349,27 @@ class BlockInfo extends XdrPayload {
 
   BlockInfo(this.size, this.hash);
   BlockInfo.fromBytes(List<int> bytes) : super.fromBytes(bytes);
+}
+
+class Ping extends BlockPayload {
+  static const int TYPE = 4;
+
+  Ping() : super(TYPE);
+  Ping.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
+}
+
+class Pong extends BlockPayload {
+  static const int TYPE = 5;
+
+  Pong() : super(TYPE);
+  Pong.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
+}
+
+class Close extends BlockPayload {
+  static const int TYPE = 7;
+
+  XdrString reason;
+
+  Close(this.reason) : super(TYPE);
+  Close.fromBytes(List<int> bytes) : super.fromBytes(TYPE, bytes);
 }

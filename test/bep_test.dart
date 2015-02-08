@@ -7,6 +7,7 @@ import 'package:unittest/unittest.dart';
 
 part 'bep_config_test.dart';
 part 'bep_index_test.dart';
+part 'bep_other_test.dart';
 
 void runTests() {
   group('Block exchange messages', () {
@@ -45,4 +46,5 @@ void runTests() {
 
   runConfigTests();
   runIndexTests();
+  runOtherTests();
 }
