@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<link rel="import" href="../packages/polymer/polymer.html">
+
+<link rel="import" href="../packages/paper_elements/paper_button.html">
+<link rel="import" href="../packages/paper_elements/paper_shadow.html">
+<link rel="import" href="../packages/paper_elements/paper_toggle_button.html">
+
+<polymer-element name="syncthing-device-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 24px;
+      }
+
+      paper-shadow {
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        max-width: 400px;
+      }
+
+      #content {
+        padding: 16px;
+      }
+
+      #content > div {
+        margin-bottom: 8px;
+      }
+
+      #content > div:last-child {
+        margin-bottom: 0;
+      }
+
+      #name {
+        font-size: 24px;
+      }
+
+      #actions {
+        padding: 8px;
+        border-top: 1px solid #ddd;
+      }
+    </style>
+    <paper-shadow z="1">
+      <div id="content" class="section">
+        <div id="name">{{ device.name }}</div>
+        <div id="status">{{ device.status }}</div>
+        <div horizontal layout>
+          <div flex>Mounted</div>
+          <paper-toggle-button checked="{{ device.mounted }}"></paper-toggle-button>
+        </div>
+      </div>
+      <div id="actions" class="section" horizontal layout>
+        <span flex></span>
+        <paper-button class="primary">Edit</paper-button>
+      </div>
+    </paper-shadow>
+  </template>
+  <script type="application/dart" src="syncthing_device_card.dart"></script>
+</polymer-element>

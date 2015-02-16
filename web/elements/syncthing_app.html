@@ -1,70 +1,74 @@
 <!DOCTYPE html>
 <link rel="import" href="../packages/polymer/polymer.html">
 
-<link rel="import" href="../packages/core_elements/core_input.html">
-<link rel="import" href="../packages/paper_elements/paper_button.html">
+<link rel="import" href="../packages/core_elements/core_header_panel.html">
+<link rel="import" href="../packages/core_elements/core_menu.html">
+<link rel="import" href="../packages/core_elements/core_toolbar.html">
+
+<link rel="import" href="../packages/paper_elements/roboto.html">
+<link rel="import" href="../packages/paper_elements/paper_dropdown.html">
+<link rel="import" href="../packages/paper_elements/paper_fab.html">
+<link rel="import" href="../packages/paper_elements/paper_icon_button.html">
 <link rel="import" href="../packages/paper_elements/paper_input_decorator.html">
+<link rel="import" href="../packages/paper_elements/paper_item.html">
+<link rel="import" href="../packages/paper_elements/paper_menu_button.html">
 
-<link rel="import" href="syncthing_log.html">
+<link rel="import" href="syncthing_device_card.html">
 
-<polymer-element name="syncthing-app">
+<polymer-element name="syncthing-app" vertical layout>
   <style>
     body {
       font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
       font-size: 14px;
     }
+
+    html /deep/ h1 {
+      font-size: 28px;
+    }
+
+    html /deep/ paper-button.primary {
+      color: #3498db;
+    }
   </style>
   <template>
-    <div vertical layout>
-      <div horizontal layout>
-        <paper-button on-click="{{ loadLocalDevice }}">Load Local Device</paper-button>
-        <div flex self-center>Device ID: {{ globals.device | formatDeviceId }}</div>
-      </div>
-      <div horizontal layout>
-        <paper-input-decorator
-          label="Device ID"
-          error="Must be a valid device ID"
-          isInvalid="{{ !$['deviceId'].validity.valid }}"
-          flex>
-            <input
-              id="deviceId"
-              is="core-input"
-              value="{{ deviceId }}"
-              pattern="[A-Z2-7]{7}(-[A-Z2-7]{7}){7}"
-              required>
-        </paper-input-decorator>
-        <paper-button on-click="{{ resolveDevice }}" self-start>Resolve</paper-button>
-      </div>
-      <div horizontal layout>
-        <paper-input-decorator
-          label="IP Address"
-          error="Must be a valid IPv4 address"
-          isInvalid="{{ !$['address'].validity.valid }}"
-          self-start
-          flex>
-            <input
-              id="address"
-              is="core-input"
-              value="{{ address }}"
-              pattern="(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))"
-              required>
-        </paper-input-decorator>
-        <paper-input-decorator
-          label="Port"
-          error="Must be a valid port number"
-          isInvalid="{{ !$['port'].validity.valid }}"
-          self-start>
-            <input
-              id="port"
-              is="core-input"
-              value="{{ port }}"
-              pattern="\d+"
-              required>
-        </paper-input-decorator>
-        <paper-button on-click="{{ connectDevice }}" self-start>Connect</paper-button>
-      </div>
-      <syncthing-log flex></syncthing-log>
-    </div>
+    <style>
+      paper-fab {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+      }
+
+      core-toolbar {
+        background-color: #f8f8f8;
+      }
+      core-toolbar h1 {
+        color: #258cd1;
+      }
+    </style>
+    <core-header-panel flex>
+      <core-toolbar>
+        <h1 flex>Syncthing</h1>
+        <paper-menu-button>
+          <paper-icon-button icon="settings"></paper-icon-button>
+          <paper-dropdown class="dropdown" halign="right">
+            <core-menu class="menu">
+              <paper-item>
+                <core-icon icon="settings"></core-icon>
+                Settings
+              </paper-item>
+              <paper-item>
+                <core-icon icon="extension"></core-icon>
+                Device ID
+              </paper-item>
+            </core-menu>
+          </paper-dropdown>
+        </paper-menu-button>
+      </core-toolbar>
+      <template repeat="{{ d in devices }}">
+        <syncthing-device-card device="{{ d }}"></syncthing-device-card>
+      </template>
+      <paper-fab icon="add"></paper-fab>
+    </core-header-panel>
   </template>
   <script type="application/dart" src="syncthing_app.dart"></script>
 </polymer-element>
