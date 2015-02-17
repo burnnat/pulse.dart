@@ -16,7 +16,7 @@
 <link rel="import" href="syncthing_device_card.html">
 
 <polymer-element name="syncthing-app" vertical layout>
-  <link href='http://fonts.googleapis.com/css?family=Raleway:800' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/css?family=Raleway:800' rel='stylesheet' type='text/css'>
   <style>
     body {
       font-family: 'RobotoDraft', 'Helvetica Neue', Helvetica, Arial;
@@ -33,6 +33,38 @@
     html /deep/ paper-button.primary {
       color: #3498db;
     }
+
+    html /deep/ paper-fab {
+      background-color: #258cd1;
+    }
+
+    html /deep/ core-toolbar {
+      background-color: #258cd1;
+      color: #fff;
+    }
+
+    /* New-style toggle buttons are not yet included in paper_elements */
+    /*
+    html /deep/ paper-toggle-button::shadow [checked] .toggle-ink {
+      color: #3498db;
+    }
+
+    html /deep/ paper-toggle-button::shadow [checked] .toggle {
+      background-color: #3498db;
+    }
+    */
+
+    html /deep/ paper-toggle-button::shadow #toggleBar[checked] {
+      background-color: #3498db;
+    }
+
+    html /deep/ paper-toggle-button::shadow #toggleRadio::shadow #onRadio {
+      background-color: #3498db;
+    }
+
+    html /deep/ paper-toggle-button::shadow #toggleRadio::shadow #ink[checked] {
+      color: #3498db;
+    }
   </style>
   <template>
     <style>
@@ -42,17 +74,16 @@
         bottom: 20px;
       }
 
-      core-toolbar {
-        background-color: #258cd1;
-        color: #fff;
-      }
-
       core-toolbar #logo {
         margin: 0;
       }
 
       core-toolbar paper-dropdown {
         color: #000;
+      }
+
+      paper-item core-icon {
+        margin-right: 0.5em;
       }
     </style>
     <core-header-panel flex>
@@ -62,21 +93,19 @@
         <paper-menu-button>
           <paper-icon-button icon="settings"></paper-icon-button>
           <paper-dropdown class="dropdown" halign="right">
-            <core-menu class="menu">
-              <paper-item>
-                <core-icon icon="settings"></core-icon>
-                Settings
-              </paper-item>
-              <paper-item>
-                <core-icon icon="extension"></core-icon>
-                Device ID
-              </paper-item>
-            </core-menu>
+            <paper-item>
+              <core-icon icon="settings"></core-icon>
+              Settings
+            </paper-item>
+            <paper-item>
+              <core-icon icon="extension"></core-icon>
+              Device ID
+            </paper-item>
           </paper-dropdown>
         </paper-menu-button>
       </core-toolbar>
-      <template repeat="{{ d in devices }}">
-        <syncthing-device-card device="{{ d }}"></syncthing-device-card>
+      <template repeat="{{ devices }}">
+        <syncthing-device-card device="{{}}"></syncthing-device-card>
       </template>
       <paper-fab icon="add"></paper-fab>
     </core-header-panel>
