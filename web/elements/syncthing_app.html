@@ -16,14 +16,18 @@
 <link rel="import" href="syncthing_device_card.html">
 
 <polymer-element name="syncthing-app" vertical layout>
+  <link href='http://fonts.googleapis.com/css?family=Raleway:800' rel='stylesheet' type='text/css'>
   <style>
     body {
-      font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      font-family: 'RobotoDraft', 'Helvetica Neue', Helvetica, Arial;
       font-size: 14px;
+      background-color: #f8f8f8;
     }
 
     html /deep/ h1 {
+      font-family: 'Raleway', 'Helvetica Neue', Helvetica, Arial;
       font-size: 28px;
+      font-weight: 800;
     }
 
     html /deep/ paper-button.primary {
@@ -39,14 +43,21 @@
       }
 
       core-toolbar {
-        background-color: #f8f8f8;
+        background-color: #258cd1;
+        color: #fff;
       }
-      core-toolbar h1 {
-        color: #258cd1;
+
+      core-toolbar #logo {
+        margin: 0;
+      }
+
+      core-toolbar paper-dropdown {
+        color: #000;
       }
     </style>
     <core-header-panel flex>
       <core-toolbar>
+        <img id="logo" src="/assets/icon_flat_white.svg" height="56" />
         <h1 flex>Syncthing</h1>
         <paper-menu-button>
           <paper-icon-button icon="settings"></paper-icon-button>
