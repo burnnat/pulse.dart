@@ -14,6 +14,7 @@
 <link rel="import" href="../packages/paper_elements/paper_menu_button.html">
 
 <link rel="import" href="syncthing_device_card.html">
+<link rel="import" href="syncthing_device_dialog.html">
 
 <polymer-element name="syncthing-app" vertical layout>
   <link href='//fonts.googleapis.com/css?family=Raleway:800' rel='stylesheet' type='text/css'>
@@ -24,14 +25,25 @@
       background-color: #f8f8f8;
     }
 
-    html /deep/ h1 {
-      font-family: 'Raleway', 'Helvetica Neue', Helvetica, Arial;
-      font-size: 28px;
-      font-weight: 800;
+    .core-overlay-backdrop.core-opened {
+      opacity: 0.3;
+    }
+
+    html /deep/ h1, html /deep/ h2 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    html /deep/ h2 {
+      font-weight: normal;
     }
 
     html /deep/ paper-button.primary {
       color: #3498db;
+    }
+
+    html /deep/ paper-button.destructive {
+      color: #df2e1b;
     }
 
     html /deep/ paper-fab {
@@ -65,6 +77,10 @@
     html /deep/ paper-toggle-button::shadow #toggleRadio::shadow #ink[checked] {
       color: #3498db;
     }
+
+    html /deep/ paper-input-decorator /deep/ .focused-underline {
+      background-color: #3498db;
+    }
   </style>
   <template>
     <style>
@@ -76,6 +92,12 @@
 
       core-toolbar #logo {
         margin: 0;
+      }
+
+      core-toolbar h1 {
+        font-family: 'Raleway', 'Helvetica Neue', Helvetica, Arial;
+        font-size: 28px;
+        font-weight: 800;
       }
 
       core-toolbar paper-dropdown {
@@ -105,10 +127,17 @@
         </paper-menu-button>
       </core-toolbar>
       <template repeat="{{ devices }}">
-        <syncthing-device-card device="{{}}"></syncthing-device-card>
+        <syncthing-device-card
+          device="{{}}"
+          on-edit="{{ editDevice }}">
+        </syncthing-device-card>
       </template>
-      <paper-fab icon="add"></paper-fab>
+      <paper-fab
+        icon="add"
+        on-click="{{ addDevice }}">
+      </paper-fab>
     </core-header-panel>
+    <syncthing-device-dialog id="device-dialog"></syncthing-device-dialog>
   </template>
   <script type="application/dart" src="syncthing_app.dart"></script>
 </polymer-element>

@@ -3,24 +3,22 @@
 
 <link rel="import" href="../packages/paper_elements/paper_input_decorator.html">
 
-<polymer-element name="syncthing-device-card">
+<polymer-element name="syncthing-device-input" attributes="value">
   <template>
     <style>
     </style>
-    <template>
-      <paper-input-decorator
-        label="Device ID"
-        error="Must be a valid device ID"
-        isInvalid="{{ !$['deviceId'].validity.valid }}"
-        flex>
-          <input
-            id="deviceId"
-            is="core-input"
-            value="{{ value }}"
-            pattern="[A-Z2-7]{7}(-[A-Z2-7]{7}){7}"
-            required>
-      </paper-input-decorator>
-    </template>
+    <paper-input-decorator
+      label="Device ID"
+      error="Must be a valid device ID"
+      isInvalid="{{ !$['deviceId'].validity.valid }}"
+      flex>
+        <input
+          id="deviceId"
+          is="core-input"
+          value="{{ value }}"
+          pattern="[A-Z2-7]{7}(-[A-Z2-7]{7}){7}"
+          required>
+    </paper-input-decorator>
   </template>
   <script type="application/dart" src="syncthing_device_input.dart"></script>
 </polymer-element>

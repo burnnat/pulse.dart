@@ -5,7 +5,7 @@
 <link rel="import" href="../packages/paper_elements/paper_shadow.html">
 <link rel="import" href="../packages/paper_elements/paper_toggle_button.html">
 
-<polymer-element name="syncthing-device-card">
+<polymer-element name="syncthing-device-card" attributes="device">
   <template>
     <style>
       :host {
@@ -24,16 +24,12 @@
         padding: 16px;
       }
 
-      #content > div {
+      #content > * {
         margin-bottom: 8px;
       }
 
-      #content > div:last-child {
+      #content > *:last-child {
         margin-bottom: 0;
-      }
-
-      #name {
-        font-size: 24px;
       }
 
       #actions {
@@ -43,7 +39,7 @@
     </style>
     <paper-shadow z="1">
       <div id="content" class="section">
-        <div id="name">{{ device.name }}</div>
+        <h2>{{ device.details.name }}</h2>
         <div id="status">{{ device.status }}</div>
         <div horizontal layout>
           <div flex>Mounted</div>
@@ -52,7 +48,7 @@
       </div>
       <div id="actions" class="section" horizontal layout>
         <span flex></span>
-        <paper-button class="primary">Edit</paper-button>
+        <paper-button class="primary" on-click="{{ fireEdit }}">Edit</paper-button>
       </div>
     </paper-shadow>
   </template>

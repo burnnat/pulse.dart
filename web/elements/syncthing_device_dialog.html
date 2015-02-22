@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<link rel="import" href="../packages/polymer/polymer.html">
+
+<link rel="import" href="../packages/paper_elements/paper_action_dialog.html">
+<link rel="import" href="../packages/paper_elements/paper_button.html">
+<link rel="import" href="../packages/paper_elements/paper_input.html">
+
+<link rel="import" href="syncthing_device_input.html">
+
+<polymer-element name="syncthing-device-dialog">
+  <style>
+    html /deep/ paper-action-dialog.device-dialog::shadow #scroller {
+      min-width: 600px;
+    }
+  </style>
+  <template>
+    <paper-action-dialog
+      id="dialog"
+      class="device-dialog"
+      backdrop
+      heading="{{ editing ? 'Edit' : 'Add' }} Device">
+        <paper-input-decorator
+          label="Device Name"
+          flex>
+            <input
+              id="deviceName"
+              is="core-input"
+              value="{{ details.name }}"
+              required>
+        </paper-input-decorator>
+        <syncthing-device-input value="{{ details.id }}"></syncthing-device-input>
+
+        <template if="{{ editing }}">
+          <paper-button id="delete" class="destructive" dismissive>Delete</paper-button>
+        </template>
+        <paper-button id="cancel" affirmative>Cancel</paper-button>
+        <paper-button id="save" class="primary" affirmative autofocus>{{ editing ? 'Save' : 'Add' }}</paper-button>
+    </paper-action-dialog>
+  </template>
+  <script type="application/dart" src="syncthing_device_dialog.dart"></script>
+</polymer-element>

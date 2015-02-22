@@ -5,7 +5,7 @@ import 'package:polymer/polymer.dart';
 @CustomTag('syncthing-device-input')
 class SyncthingDeviceInput extends PolymerElement {
 
-  @observable
+  @published
   String value;
 
   SyncthingDeviceInput.created() : super.created();
