@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<link rel="import" href="../packages/polymer/polymer.html">
+
+<link rel="import" href="../packages/paper_elements/paper_action_dialog.html">
+<link rel="import" href="../packages/paper_elements/paper_button.html">
+
+<link rel="import" href="../contrib/qr-code.html">
+
+<polymer-element name="syncthing-id-dialog" attributes="device">
+  <style>
+    html /deep/ paper-action-dialog.id-dialog::shadow #scroller {
+      min-width: 600px;
+    }
+
+    html /deep/ paper-action-dialog.id-dialog /deep/ #raw {
+      font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+      border: 1px solid #e3e3e3;
+      border-radius: 4px;
+      background-color: #f5f5f5;
+      padding: 9px;
+      margin: 16px;
+    }
+  </style>
+  <template>
+    <paper-action-dialog
+      id="dialog"
+      class="id-dialog"
+      backdrop
+      heading="Device ID">
+        <div vertical layout center>
+          <div id="raw">{{ device | formatDeviceId }}</div>
+          <qr-code
+            data="{{ device | formatDeviceId }}"
+            size="8"
+            format="html">
+          </qr-code>
+        </div>
+        <paper-button affirmative autofocus>Close</paper-button>
+    </paper-action-dialog>
+  </template>
+  <script type="application/dart" src="syncthing_id_dialog.dart"></script>
+</polymer-element>

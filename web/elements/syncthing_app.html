@@ -15,6 +15,7 @@
 
 <link rel="import" href="syncthing_device_card.html">
 <link rel="import" href="syncthing_device_dialog.html">
+<link rel="import" href="syncthing_id_dialog.html">
 
 <polymer-element name="syncthing-app" vertical layout>
   <link href='//fonts.googleapis.com/css?family=Raleway:800' rel='stylesheet' type='text/css'>
@@ -119,7 +120,7 @@
               <core-icon icon="settings"></core-icon>
               Settings
             </paper-item>
-            <paper-item>
+            <paper-item on-click="{{ showDeviceId }}">
               <core-icon icon="extension"></core-icon>
               Device ID
             </paper-item>
@@ -138,6 +139,7 @@
       </paper-fab>
     </core-header-panel>
     <syncthing-device-dialog id="device-dialog"></syncthing-device-dialog>
+    <syncthing-id-dialog id="id-dialog" device="{{ globals.device }}"></syncthing-id-dialog>
   </template>
   <script type="application/dart" src="syncthing_app.dart"></script>
 </polymer-element>
