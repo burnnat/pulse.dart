@@ -13,6 +13,9 @@ class SyncthingDeviceDialog extends PolymerElement {
   DeviceDetailsModel details;
 
   @published
+  DeviceDetailsModel working;
+
+  @published
   bool editing;
 
   PaperActionDialog dialog;
@@ -28,12 +31,21 @@ class SyncthingDeviceDialog extends PolymerElement {
   void add() {
     editing = false;
     details = new DeviceDetailsModel.empty();
-    dialog.open();
+    init();
   }
 
   void edit(DeviceModel device) {
     editing = true;
     details = device.details;
+    init();
+  }
+
+  void init() {
+    working = new DeviceDetailsModel.from(details);
     dialog.open();
+  }
+
+  void save() {
+    details.commit(working);
   }
 }

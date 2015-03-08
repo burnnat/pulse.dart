@@ -26,16 +26,27 @@
             <input
               id="deviceName"
               is="core-input"
-              value="{{ details.name }}"
+              value="{{ working.name }}"
               required>
         </paper-input-decorator>
-        <syncthing-device-input value="{{ details.id }}"></syncthing-device-input>
+        <syncthing-device-input value="{{ working.id }}"></syncthing-device-input>
 
         <template if="{{ editing }}">
           <paper-button id="delete" class="destructive" dismissive>Delete</paper-button>
         </template>
-        <paper-button id="cancel" affirmative>Cancel</paper-button>
-        <paper-button id="save" class="primary" affirmative autofocus>{{ editing ? 'Save' : 'Add' }}</paper-button>
+        <paper-button
+          id="cancel"
+          affirmative>
+          Cancel
+        </paper-button>
+        <paper-button
+          id="save"
+          on-click="{{ save }}"
+          class="primary"
+          affirmative
+          autofocus>
+          {{ editing ? 'Save' : 'Add' }}
+        </paper-button>
     </paper-action-dialog>
   </template>
   <script type="application/dart" src="syncthing_device_dialog.dart"></script>

@@ -22,5 +22,13 @@ class DeviceDetailsModel extends Observable {
 
   DeviceDetailsModel.empty();
 
+  DeviceDetailsModel.from(DeviceDetailsModel model) :
+    this(model.name, model.id);
+
   DeviceDetailsModel(this.name, this.id);
+
+  void commit(DeviceDetailsModel model) {
+    this.name = model.name;
+    this.id = model.id;
+  }
 }
