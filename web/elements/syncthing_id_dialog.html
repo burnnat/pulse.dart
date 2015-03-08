@@ -4,7 +4,8 @@
 <link rel="import" href="../packages/paper_elements/paper_action_dialog.html">
 <link rel="import" href="../packages/paper_elements/paper_button.html">
 
-<link rel="import" href="../contrib/qr-code.html">
+<script type="text/javascript" src="../contrib/qr-code/src/qr.js"></script>
+<link rel="import" href="../contrib/qr-code/src/qr-code.html">
 
 <polymer-element name="syncthing-id-dialog" attributes="device">
   <style>
@@ -33,6 +34,7 @@
           <qr-code
             data="{{ device | formatDeviceId }}"
             size="8"
+            margin="0"
             format="html">
           </qr-code>
         </div>

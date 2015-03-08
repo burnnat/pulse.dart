@@ -1,0 +1,6 @@
+{
+  "directory": "web/contrib",
+  "scripts": {
+    "postinstall": "dart tool/bower.dart %"
+  }
+}

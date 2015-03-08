@@ -1,0 +1,17 @@
+{
+  "name": "syncthing.dart",
+  "authors": [
+    "Nat Burns <nbaccount@burnskids.com>"
+  ],
+  "license": "GPL-3.0+",
+  "private": true,
+  "dependencies": {
+    "ajax-form": "~1.5.2",
+    "qr-code": "~0.0.1"
+  },
+  "ignoredDependencies": [
+    "core-component-page",
+    "polymer",
+    "webcomponentsjs"
+  ]
+}

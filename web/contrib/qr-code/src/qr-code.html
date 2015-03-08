@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<link rel="import" href="../packages/polymer/polymer.html">
-<script type="text/javascript" src="qr.js"></script>
-
+<link rel="import" href="../../packages/polymer/polymer.html">
 <polymer-element name="qr-code"
-		 attributes="data format size">
+        attributes="data format size margin">
 
 	<script>
 		Polymer('qr-code', {
 
             format: 'png',
 
-            size: 5,
-
             dataChanged: function () {
                 this.generate();
             },
 
             getOptions: function () {
-                return {
-                    modulesize: this.size,
+                var margin = this.margin;
+
+                if (margin === 0) {
                     // Passing 0 causes qr.js to use the default margin of 4,
                     // so we need to pass a value of -1 to explicitly disable margins.
-                    margin: -1
+                    margin = -1;
+                }
+
+                return {
+                    modulesize: this.size,
+                    margin: margin
                 };
             },
 
